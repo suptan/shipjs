@@ -13,7 +13,8 @@
     "lint:fix": "eslint --fix src",
     "lint": "eslint ./src",
     "unit-test": "NODE_ENV=test jest --silent --coverage --forceExit __tests__/unit",
-    "unit-test:watch": "NODE_ENV=test jest __tests__/unit --watch"
+    "unit-test:watch": "NODE_ENV=test jest __tests__/unit --watch",
+    "e2e-test:watch": "NODE_ENV=test npm run migrate:sequelize && jest __tests__/e2e --watch"
   },
   "dependencies": {
     "@babel/runtime": "~7.8.3",
