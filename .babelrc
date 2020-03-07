@@ -1,0 +1,26 @@
+{
+  "presets": [
+    "@babel/env",
+  ],
+  "plugins": [
+    ["@babel/plugin-transform-runtime", {
+      "regenerator": true
+    }],
+    [
+      "module-resolver",
+      {
+        "root": [
+          "./"
+        ],
+        "alias": {
+          "migrations": "./src/migrations",
+          "models": "./src/models",
+          "utils": "./src/utils",
+          "repositories": "./src/repositories",
+          "services": "./src/services",
+          "mocks": "./__mocks__",
+        }
+      }
+    ],
+  ]
+}

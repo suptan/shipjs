@@ -1,0 +1,68 @@
+version: '3'
+
+services:
+  shipjs:
+    build: .
+    command: bash  -c 'npm install && npm run dev'
+    image: assign/shipjs
+    volumes:
+      - '.:/usr/src/app'
+      -  shipjs-node_modules:/usr/src/app/node_modules
+    ports:
+      - '9008:8080'
+    networks:
+      - shipjs
+    depends_on:
+      - shipjs-postgreq
+    environment:
+      NODE_ENV: 'development'
+      POSTGRES_USER: 'api'
+      POSTGRES_PASSWORD: 'api'
+      POSTGRES_DB: 'shipjs'
+      POSTGRES_HOST: 'shipjs-postgreq'
+      POSTGRES_PORT: '5432'
+      ENABLE_SWAGGER: 'true'
+      SWAGGER_SECRET_KEY: 'secretKey'
+    networks:
+      - shipjs
+  shipjs-postgreq:
+    image: postgres:11
+    volumes:
+      - 'shipjs-db:/var/lib/postgresql/data/pgdata'
+    ports:
+      - '5004:5432'
+    environment:
+      PGDATA: '/var/lib/postgresql/data/pgdata'
+      POSTGRES_USER: 'api'
+      POSTGRES_PASSWORD: 'api'
+      POSTGRES_DB: 'shipjs'
+    networks:
+      - shipjs
+  test:
+    build: .
+    image: assign/test-shipjs
+    command: npm run unit-test:watch
+    volumes:
+      - '.:/usr/src/app'
+      -  shipjs-node_modules:/usr/src/app/node_modules
+    networks:
+      - shipjs
+  test-db:
+    image: postgres:11
+    volumes:
+      - 'shipjs-test-db:/var/lib/postgresql/data/pgdata'
+    ports:
+      - '5004:5432'
+    environment:
+      PGDATA: '/var/lib/postgresql/data/pgdata'
+      POSTGRES_USER: 'api'
+      POSTGRES_PASSWORD: 'api'
+      POSTGRES_DB: 'shipjs'
+    networks:
+      - shipjs
+volumes:
+  shipjs-db:
+  shipjs-node_modules:
+  shipjs-test-db:
+networks:
+  shipjs:
