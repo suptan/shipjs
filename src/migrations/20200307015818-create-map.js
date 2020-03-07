@@ -9,13 +9,14 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       name: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        unique: true
       },
       grid_vertical: {
-        type: Sequelize.STRING
+        type: Sequelize.INTEGER
       },
       grid_horizontal: {
-        type: Sequelize.STRING
+        type: Sequelize.INTEGER
       },
       status: {
         type: Sequelize.INTEGER
