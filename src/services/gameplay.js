@@ -1,6 +1,6 @@
 import { get, map, uniq } from 'lodash/fp';
 import { LobbyEmptyException, LevelNotFoundException } from 'exceptions';
-import { gameplay, level, player } from 'domains';
+import { gameplay, level, player, gameplayPlayer } from 'domains';
 import model from 'models';
 import { logInfo, logDebug } from 'utils';
 
@@ -29,11 +29,15 @@ const create = async ({ levelId, players }) => {
 
     // Create a new game for players to join
     logInfo('Creating a new game');
-    const newGameplay = await gameplay.create({ levelId: get('id', levelInfo) }, { transaction });
-    logDebug('Done a new game', newGameplay);
+    // const newGameplay = await gameplay.create({ levelId: get('id', levelInfo) }, { transaction });
+    const newGameplay = await model.gameplay.findByPk(1, { transaction });
+    const newGameId = newGameplay.id;
+    logDebug('Done a new game', newGameId);
+    const validPlayerIds = map('id', playerProfiles);
 
     // Assign players to the game session
-    
+    const gamePlayer = await gameplayPlayer.bulkCreate({ gameplayId: newGameId, playerIds: validPlayerIds }, { transaction });
+    logDebug('gamePlayer', gamePlayer);
 
     return {
       id: newGameplay.id

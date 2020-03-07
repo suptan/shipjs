@@ -10,6 +10,10 @@ const VALIDATE = {
   PLAYER_NOT_JOIN: {
     statusCode: '400',
     message: 'player unable to join this game'
+  },
+  INVALID_GAME: {
+    statusCode: '422',
+    message: 'This game session is not valid to join'
   }
 };
 

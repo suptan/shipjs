@@ -7,6 +7,7 @@ import level from './levels';
 import map from './map';
 import player from './players';
 import ship from './ships';
+import gameplayPlayers from './gameplay-players';
 
 const sequelize = new Sequelize(
   config.DB_SCHEMA,
@@ -41,6 +42,7 @@ const db = {
   map: sequelize.import('map', map),
   player: sequelize.import('player', player),
   ship: sequelize.import('ship', ship),
+  gameplayPlayer: sequelize.import('gameplay_player', gameplayPlayers),
 };
 
 Object.keys(db).forEach(model => {
