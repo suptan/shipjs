@@ -1,4 +1,4 @@
-import model from 'models';
+import models from 'models';
 import { map } from 'lodash/fp';
 import { InvalidGameException } from 'exceptions';
 import { logInfo, logDebug } from 'utils';
@@ -19,9 +19,28 @@ const bulkCreate = async ({ gameplayId, playerIds }, modelOptions = {}) => {
   }), playerIds);
   logDebug(gameplayPlayers, gameplayId);
   // return await model.gameplay.create({ levelId, status: 1 }, modelOptions);
-  return await model.gameplayPlayer.bulkCreate(gameplayPlayers, modelOptions);
+  return await models.gameplayPlayer.bulkCreate(gameplayPlayers, modelOptions);
 };
+
+const findOneWithMapById = async id => await models.gameplayPlayer.findByPk(id, {
+  include: [
+    {
+      model: models.gameplay,
+      include: [
+        {
+          model: models.level,
+          include: [
+            {
+              model: models.map,
+            },
+          ],
+        },
+      ],
+    },
+  ],
+});
 
 export default {
   bulkCreate,
+  findOneWithMapById
 };

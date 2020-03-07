@@ -1,9 +1,11 @@
 import express from 'express';
 import errorHandle from 'middlewares/error-handle';
 import gameplay from './gameplay';
+import playerFleet from './player-fleet';
 
 const controllers = [
-  gameplay
+  gameplay,
+  playerFleet,
 ];
 
 const api = express.Router();

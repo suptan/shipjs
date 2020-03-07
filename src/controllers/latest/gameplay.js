@@ -57,19 +57,11 @@ router.post(
   }),
   asyncWrapper(async (req, res) => {
     const body = pick(keys(createGamePlaySchema), req.body);
-    // try {
     const result = await gameplay.create(body);
-    // const result = { body };
     res.send({
       statusCode: '200',
       data: result,
     });
-    // } catch (error) {
-
-    //   console.log(error);
-      
-    //   res.send({...error});
-    // }
   }),
 );
 
