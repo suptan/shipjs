@@ -1,12 +1,11 @@
 import { transformModel } from 'utils';
 
 export default (sequelize, DataTypes) => {
-  const gameplays = sequelize.define('gameplays', transformModel({
+  const level_fleets = sequelize.define('level_fleets', transformModel({
     status: { type: DataTypes.INTEGER }
-  }), { paranpod: true });
-
-  gameplays.associate = function() {
+  }), { paranoid: true });
+  level_fleets.associate = function() {
     // associations can be defined here
   };
-  return gameplays;
+  return level_fleets;
 };

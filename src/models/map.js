@@ -8,10 +8,8 @@ export default (sequelize, DataTypes) => {
     status: { type: DataTypes.INTEGER, allowNull: false }
   };
 
-  const Map = sequelize.define('map', transformModel(model), {
+  const Map = sequelize.define('maps', transformModel(model), {
     paranoid: true,
-    tableName: 'maps',
-    timestamps: true,
   });
 
   Map.associate = function() {
