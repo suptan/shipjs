@@ -42,7 +42,7 @@ const db = {
   map: sequelize.import('map', map),
   player: sequelize.import('player', player),
   ship: sequelize.import('ship', ship),
-  gameplayPlayer: sequelize.import('gameplay_player', gameplayPlayers),
+  gameplayPlayer: sequelize.import('gameplayPlayer', gameplayPlayers),
 };
 
 Object.keys(db).forEach(model => {

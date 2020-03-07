@@ -17,7 +17,7 @@ const create = async ({ levelId, players }) => {
   return model.sequelize.transaction(async (transaction) => {
     const results = await Promise.all([
       level.findOneById(levelId),
-      player.findAllById(playerIds)
+      player.findAllByIds(playerIds)
     ]);
     const levelInfo = get('0', results);
     const playerProfiles = get('1', results);
@@ -29,18 +29,19 @@ const create = async ({ levelId, players }) => {
 
     // Create a new game for players to join
     logInfo('Creating a new game');
-    // const newGameplay = await gameplay.create({ levelId: get('id', levelInfo) }, { transaction });
-    const newGameplay = await model.gameplay.findByPk(1, { transaction });
+    const newGameplay = await gameplay.create({ levelId: get('id', levelInfo) }, { transaction });
+    // const newGameplay = await model.gameplay.findByPk(1, { transaction });
     const newGameId = newGameplay.id;
     logDebug('Done a new game', newGameId);
     const validPlayerIds = map('id', playerProfiles);
 
     // Assign players to the game session
     const gamePlayer = await gameplayPlayer.bulkCreate({ gameplayId: newGameId, playerIds: validPlayerIds }, { transaction });
-    logDebug('gamePlayer', gamePlayer);
+    logDebug('gamePlayer', map('playerId', gamePlayer));
 
     return {
-      id: newGameplay.id
+      id: newGameplay.id,
+      players: map('playerId', gamePlayer)
     };
   });
 };
