@@ -1,7 +1,5 @@
 import config from './config';
 
-console.log(config);
-
 const sequelizeConfig = {
   username: config.DB_USER,
   password: config.DB_PASSWORD,

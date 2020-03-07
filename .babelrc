@@ -10,7 +10,7 @@
       "module-resolver",
       {
         "root": [
-          "./src"
+          "./"
         ],
         "alias": {
           "migrations": "./src/migrations",

@@ -6,6 +6,7 @@
   "scripts": {
     "migrate:sequelize": "npm run build && sequelize db:migrate",
     "clean": "rm -rf dist/*",
+    "start:dev": "NODE_ENV=development nodemon server/index.js --exec babel-node --presets @babel/preset-env --watch src/",
     "dev": "NODE_ENV=development npm run migrate:sequelize && webpack --watch --config ./build/webpack.config.dev.js",
     "build": "npm run clean && babel src -D -d dist",
     "start": "NODE_ENV=production node dist",

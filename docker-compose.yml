@@ -43,9 +43,8 @@ services:
     image: assign/test-shipjs
     command: npm run unit-test:watch
     volumes:
-      - "./__tests__:/usr/src/app/__tests__"
-      - "./jest.config.js:/usr/src/app/jest.config.js"
-      - "./src:/usr/src/app/src"
+      - '.:/usr/src/app'
+      -  shipjs-node_modules:/usr/src/app/node_modules
     networks:
       - shipjs
   test-db:
