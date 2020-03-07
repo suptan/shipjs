@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-  up: (queryInterface, Sequelize) => {
+  up: (queryInterface) => {
     /*
       Add altering commands here.
       Return a promise to correctly handle asynchronicity.
@@ -12,13 +12,16 @@ module.exports = {
         isBetaMember: false
       }], {});
     */
-    return queryInterface.bulkInsert('maps', [{
-      name: 'demo',
-      grid_horizontal: 10,
-      grid_vertical: 10,
+    return queryInterface.bulkInsert('ships', [{
+      name: 'Battleship',
+      size: 4,
       status: 1,
       created_at: new Date(),
-      updated_at: new Date()
+    }, {
+      name: 'Cruiser',
+      size: 3,
+      status: 1,
+      created_at: new Date(),
     }]);
   },
 
@@ -30,6 +33,6 @@ module.exports = {
       Example:
       return queryInterface.bulkDelete('People', null, {});
     */
-    return queryInterface.bulkDelete('maps', null, {});
+    return queryInterface.bulkDelete('ships', null, {});
   }
 };

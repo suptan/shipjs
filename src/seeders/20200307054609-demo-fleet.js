@@ -12,13 +12,16 @@ module.exports = {
         isBetaMember: false
       }], {});
     */
-    return queryInterface.bulkInsert('maps', [{
-      name: 'demo',
-      grid_horizontal: 10,
-      grid_vertical: 10,
+    return queryInterface.bulkInsert('fleets', [{
+      ship_id: 1,
+      amount: 1,
       status: 1,
       created_at: new Date(),
-      updated_at: new Date()
+    }, {
+      ship_id: 2,
+      amount: 2,
+      status: 1,
+      created_at: new Date(),
     }]);
   },
 
@@ -30,6 +33,5 @@ module.exports = {
       Example:
       return queryInterface.bulkDelete('People', null, {});
     */
-    return queryInterface.bulkDelete('maps', null, {});
   }
 };
