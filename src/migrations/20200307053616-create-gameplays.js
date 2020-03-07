@@ -17,7 +17,6 @@ module.exports = {
         },
       },
       winner_id: {
-        allowNull: false,
         type: Sequelize.INTEGER,
         references: {
           model: 'players',

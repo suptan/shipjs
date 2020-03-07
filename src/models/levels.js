@@ -5,8 +5,8 @@ export default (sequelize, DataTypes) => {
     status: { type: DataTypes.INTEGER }
   }), { paranoid: true });
 
-  levels.associate = function() {
-    // associations can be defined here
+  levels.associate = function(models) {
+    levels.hasMany(models.gameplay, { as: 'gameplays' });
   };
   return levels;
 };

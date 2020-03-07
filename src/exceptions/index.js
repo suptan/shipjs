@@ -11,9 +11,11 @@ class BaseException extends Error {
 
 const LevelNotFoundException = () => new BaseException(ERRORS.VALIDATE.LEVEL_NOT_FOUND);
 const LobbyEmptyException = () => new BaseException(ERRORS.VALIDATE.LOBBY_EMPTY);
+const PlayerNotJoinException = () => new BaseException(ERRORS.VALIDATE.PLAYER_NOT_JOIN);
 
 export {
   BaseException,
   LevelNotFoundException,
   LobbyEmptyException,
+  PlayerNotJoinException,
 };
