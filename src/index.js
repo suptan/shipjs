@@ -1,6 +1,8 @@
 import express from 'express';
+import bodyParser from 'body-parser';
 import config from './config';
 import { checkConnection } from './models';
+import vLatest from './controllers/latest';
 import { version } from '../package.json';
 
 const { PORT } = config;
@@ -15,5 +17,8 @@ app.get('/', async (_, res) => {
     version,
   });
 });
+
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use('/api/latest', vLatest);
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));

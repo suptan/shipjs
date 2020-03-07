@@ -1,6 +1,13 @@
 import Sequelize from 'sequelize';
 import config from '../config';
+import fleet from './fleets';
+import gameplay from './gameplays';
+import levelFleet from './level-fleets';
+import level from './levels';
 import map from './map';
+import player from './players';
+import ship from './ships';
+import gameplayPlayers from './gameplay-players';
 
 const sequelize = new Sequelize(
   config.DB_SCHEMA,
@@ -28,7 +35,14 @@ export const checkConnection = async () => {
 };
 
 const db = {
-  maps: sequelize.import('map', map),
+  fleet: sequelize.import('fleet', fleet),
+  gameplay: sequelize.import('gameplay', gameplay),
+  levelFleet: sequelize.import('levelFleet', levelFleet),
+  level: sequelize.import('level', level),
+  map: sequelize.import('map', map),
+  player: sequelize.import('player', player),
+  ship: sequelize.import('ship', ship),
+  gameplayPlayer: sequelize.import('gameplayPlayer', gameplayPlayers),
 };
 
 Object.keys(db).forEach(model => {
