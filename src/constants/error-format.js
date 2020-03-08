@@ -22,22 +22,36 @@ const VALIDATE = {
   INVALID_SHIP_PLACEMENT: {
     statusCode: '422',
     message: 'Ship cannot be place in this position'
+  },
+  PLAYER_NOT_IN_SESSION: {
+    statusCode: '422',
+    message: 'player not in this session'
+  },
+  INVALID_ATTACK_AREA: {
+    statusCode: '422',
+    message: 'this area cannot be attack'
   }
 };
 
 const QUERY = {
   MAP: {
     NOT_FOUND: {
-      statusCode: '400',
+      statusCode: '404',
       message: 'Map info not found'
     },
   },
   SHIP: {
     NOT_FOUND: {
-      statusCode: '400',
+      statusCode: '404',
       message: 'Ship info not found'
     }
-  }
+  },
+  GAMEPLAY: {
+    NOT_FOUND: {
+      statusCode: '404',
+      message: 'Game session not found'
+    }
+  },
 };
 
 export const ERRORS = { VALIDATE, QUERY };

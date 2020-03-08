@@ -42,5 +42,5 @@ const findOneWithMapById = async id => await models.gameplayPlayer.findByPk(id, 
 
 export default {
   bulkCreate,
-  findOneWithMapById
+  findOneWithMapById,
 };

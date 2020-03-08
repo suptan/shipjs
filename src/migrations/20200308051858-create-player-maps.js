@@ -16,7 +16,7 @@ module.exports = {
           key: 'id',
         },
       },
-      seized_by_player_id: {
+      attacker_id: {
         allowNull: false,
         type: Sequelize.INTEGER,
         references: {

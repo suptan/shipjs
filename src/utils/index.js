@@ -1,4 +1,5 @@
 import transformModel from './transform-model';
+import { createEmptyBoard } from './board';
 import { logError, logInfo, logDebug, logWarn } from './logger';
 
 export {
@@ -6,5 +7,6 @@ export {
   logError,
   logInfo,
   logDebug,
-  logWarn
+  logWarn,
+  createEmptyBoard,
 };
