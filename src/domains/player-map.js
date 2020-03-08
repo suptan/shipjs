@@ -12,7 +12,9 @@ const create = async ({
 
   if (!gameplayPlayerId) throw new GameSessionNotFoundException();
   if (!attackerId) throw new PlayerNotJoinException();
-  if (!seizedCoordinateX, !seizedCoordinateY) throw new InvalidAttackAreaException();
+  if ((seizedCoordinateX && seizedCoordinateX < 0)
+    || (seizedCoordinateY && seizedCoordinateY < 0))
+    throw new InvalidAttackAreaException();
 
   return await models.playerMaps.create({
     gameplayPlayerId,

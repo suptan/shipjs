@@ -11,6 +11,36 @@ const getCheckCell = async (a, b, min, max) => {
   });
 };
 
+export const getShipOnBoard = async (len, fleets, board) => {
+  const result = map(row => row.slice() ,board);
+  for (let i = 0; i < len; i += 1) {
+    // Since coordination reflect to index of array before save to database
+    // so we don't need to convert anything here
+    const { headCoordinateX: headX,
+      headCoordinateY: headY,
+      tailCoordinateX: tailX,
+      tailCoordinateY: tailY,
+      shipId: fleetId,
+    } = fleets[i];
+    logDebug('Check coordination of', fleetId);
+    // TOFIX, reduce variable
+    const rowLen = Math.abs(headY - tailY);
+    const colLen = Math.abs(headX - tailX);
+    const startRow = Math.min(headY, tailY);
+    const startCol = Math.min(headX, tailX);
+    const endRow = startRow + rowLen;
+    const endCol = startCol + colLen;
+
+    for (let i = startRow; i <= endRow; i++) {
+      for (let j = startCol; j <= endCol; j++) {
+        result[i][j] = 1;
+      }
+    }
+  }
+
+  return result;
+};
+
 const create = async(body) => {
   logInfo('Place a ship in map');
   const { gameplayPlayerId, shipId, headCoordinateX,
@@ -48,41 +78,19 @@ const create = async(body) => {
 
     // Create a board which no ship in any cells
     const { gridHorizontal, gridVertical } = mapInfo;
-    let board = [];
-    while (board.length < gridVertical) {
+    const emptyBoard = [];
+    while (emptyBoard.length < gridVertical) {
       // deep clone array
       const rows = [];
       rows[gridHorizontal - 1] = 0;
-      board.push(rows);
+      emptyBoard.push(rows);
     }
     // logDebug('board', board);
 
-    // Fill existing ship into the board
     logDebug('len', len);
-    for (let i = 0; i < len; i +=1) {
-      // Since coordination reflect to index of array before save to database
-      // so we don't need to convert anything here
-      const { headCoordinateX: headX,
-        headCoordinateY: headY,
-        tailCoordinateX: tailX,
-        tailCoordinateY: tailY,
-        shipId: fleetId,
-      } = fleets[i];
-      logDebug('Check coordination of', fleetId);
-      // TOFIX, reduce variable
-      const rowLen = Math.abs(headY - tailY);
-      const colLen = Math.abs(headX - tailX);
-      const startRow = Math.min(headY, tailY);
-      const startCol = Math.min(headX, tailX);
-      const endRow = startRow + rowLen;
-      const endCol = startCol + colLen;
-
-      for (let i = startRow; i <= endRow; i++) {
-        for (let j = startCol; j <= endCol; j++) {
-          board[i][j] = 1;
-        }
-      }
-    }
+    // Fill existing ship into the board
+    // TOFIX, store to DB
+    const board = await getShipOnBoard(len, fleets, emptyBoard);
     logDebug('board with ship', board);
 
     // Place new ship into the board

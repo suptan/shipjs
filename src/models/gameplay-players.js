@@ -10,6 +10,7 @@ export default (sequelize, DataTypes) => {
   gameplayPlayers.associate = function(models) {
     gameplayPlayers.belongsTo(models.gameplay);
     gameplayPlayers.belongsTo(models.player);
+    gameplayPlayers.hasMany(models.playerFleet, { foreignKey: 'gameplay_player_id', as: 'playerFleet'});
   };
 
   return gameplayPlayers;

@@ -40,7 +40,35 @@ const findOneWithMapById = async id => await models.gameplayPlayer.findByPk(id, 
   ],
 });
 
+const findOneWithMapAndFleetById = async id => await models.gameplayPlayer.findByPk(id, {
+  include: [
+    {
+      model: models.gameplay,
+      include: [
+        {
+          model: models.level,
+          include: [
+            {
+              model: models.map,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      model: models.playerFleet,
+      as: 'playerFleet',
+      include: [
+        {
+          model: models.ship,
+        },
+      ],
+    },
+  ],
+});
+
 export default {
   bulkCreate,
   findOneWithMapById,
+  findOneWithMapAndFleetById,
 };
