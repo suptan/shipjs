@@ -1,9 +1,8 @@
 import models from 'models';
-import { filter, find, get, map, reduce } from 'lodash/fp';
+import { filter, find, get, isEmpty, isEqual, map, values } from 'lodash/fp';
 import { logInfo, logDebug } from "utils/logger";
 import { gameplayPlayer, playerMap, playerFleet } from 'domains';
 import { GameSessionNotFoundException } from 'src/exceptions';
-import { createEmptyBoard } from 'utils';
 import PLAYER_FLEET_STATUS from 'constants/player-fleet-status';
 
 const create = async ({
@@ -19,11 +18,11 @@ const create = async ({
 
     if (!gameplayer) throw new GameSessionNotFoundException();
     // TODO, check player profile
-    // TODO, check attack coordinate in map area
+    // TODO, check attack coordinate in map area and positive or 0
     // TODO, check attacker turn
     // TODO, check game plan phase should end before attack start
 
-    const attack = { row: seizedCoordinateY - 1, col: seizedCoordinateX - 1 };
+    const attack = { row: seizedCoordinateY, col: seizedCoordinateX };
     logDebug('Attack coordinate', attack);
     await playerMap.create({
       gameplayPlayerId,
@@ -31,7 +30,6 @@ const create = async ({
       seizedCoordinateX: attack.col,
       seizedCoordinateY: attack.row,
     }, { transaction });
-    const mapInfo = get(['gameplay', 'level', 'map'], gameplayer);
     const playerFleets = get(['playerFleet'], gameplayer);
 
     // After the attack
@@ -40,31 +38,30 @@ const create = async ({
     //     + When all defender fleets sank, game will end
 
     logInfo('Calculate defender fleet damage');
-    // TODO, refactor to ask for player status service
-    const playerMapInfo = await playerMap.findAllByGamePlayerId(gameplayPlayerId);
-    const board = createEmptyBoard(mapInfo);
-    // Fill board damage
-    // TOFIX, store board state to DB
-    const seizedBoard = map(row => row.slice(), board);
-    reduce((sum, { seizedCoordinateX: col, seizedCoordinateY: row }) => {
-      sum[row][col] = 1;
-      return sum;
-    }, seizedBoard)(playerMapInfo);
-    logDebug('seizedBoard', seizedBoard);
-    // logDebug('board', board);
+    // TODO, refactor to ask for player status
 
-    // const shipOnBoard =  await getShipOnBoard(playerFleets.length, playerFleets, board);
-    // logDebug('ship on board', shipOnBoard);
+
+    // Fill board damage
+    const seizedBoard = gameplayer.playerMap;
+    logDebug('seizedBoard', seizedBoard);
 
     // TOFIX, store ship location as an array of object with coordinator and hit,
     // then update hit data to true where coordinator is matched
     // after that check all hits in array is true then sank the ship
     // Check ships damage
-    let confirmHit = false;
+    let confirmHit = !!seizedBoard[attack.row][attack.col];
     let isWinner = false;
     let sunkenShip = 0;
+    let damageShip = 0;
+    let calHp = [];
+
+    // Update player map info
+    seizedBoard[attack.row][attack.col] = 2;
+    const updateMap = gameplayer.update({ playerMap: seizedBoard }, { transaction });
+
+    // Check ship status
     map(({
-      id, status, ship: { name, size },
+      id, status, ship: { name }, hp,
       headCoordinateX, headCoordinateY, tailCoordinateX, tailCoordinateY,
     }) => {
       // Ignore damage calculation for Sunken ship
@@ -73,47 +70,46 @@ const create = async ({
       logDebug('playerFleets', id);
       const row = [headCoordinateY, tailCoordinateY].sort();
       const col = [headCoordinateX, tailCoordinateX].sort();
+      const focusCell = values(attack);
       logDebug(row , col);
-      let count = 0;
-      for (let i = row[0]; i <= row[1]; i++) {
-        for (let j = col[0]; j <= col[1]; j++) {
-          if (i === attack.row && j === attack.col) {
-            logInfo('Attacker successfully hit a ship');
-            confirmHit = true;
-            count++;
-          } else if (seizedBoard[i][j]) count++;
 
-          if(count === size) {
-            logInfo('Attacker just sank a ship');
-            sunkenShip = {
-              fleetId: id,
-              name
-            };
-            return;
-          }
-        }
+      calHp = filter(cell => !isEqual(focusCell, cell), hp);
+
+      if (isEmpty(calHp)) {
+        logInfo('Attacker just sank a ship');
+        sunkenShip = {
+          fleetId: id,
+          name
+        };
+
+        return;
+      } else if (!isEqual(hp, calHp)) {
+        damageShip = {
+          id,
+          hp: calHp,
+        };
       }
-      logDebug(`Ship damage ${count}`, `Ship hp ${size} - ${count}`);
-
     }, playerFleets.slice(3));
 
+    // Attacker either damage or sank the ship
     if (sunkenShip) {
       logInfo('Sank defender ship');
       await playerFleet.updatedSink(
         find(({ id }) => sunkenShip.fleetId === id, playerFleets),
         { transaction }
       );
+    } else if (damageShip) {
+      logInfo('Reduce ship hp');
+      await playerFleet.updateById(damageShip, { transaction });
     }
 
     // When defender has no ship left, attacker win and game will end
     const sankShips = filter(({ status }) => status === PLAYER_FLEET_STATUS.SANK, playerFleets);
 
-    // isWinner = sankShips.length === playerFleets.length
     if (sankShips.length === playerFleets.length) {
       logInfo('We have the winner');
       isWinner = true;
     }
-    // logDebug(map(({id,status}) => ({id,status}), playerFleets));
 
     let message = 'Miss';
 
@@ -123,8 +119,12 @@ const create = async ({
       message = `Win! You have completed the game in ${moves + 1} moves`;
     }
     else if (confirmHit) {
+      logInfo('Attacker successfully hit a ship');
       message = sunkenShip ? `You just sank a ${sunkenShip.name}` : 'Hit';
     }
+
+    // Ensure map data is updated
+    await updateMap;
 
     return {
       message,

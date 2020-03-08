@@ -9,7 +9,7 @@ import { gameplayPlayer } from 'domains';
 const router = express.Router();
 
 const isNumber = Joi.number();
-const isPositive = Joi.number().positive();
+const isPositive = Joi.number().positive().allow(0);
 
 const createPlayerFleetSchema = {
   gameplayPlayerId: isNumber.required(),

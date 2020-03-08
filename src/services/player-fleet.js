@@ -144,12 +144,14 @@ const create = async(body) => {
     }
 
     logInfo('The criteria for place a ship is matched');
-    // Update player map with new ship  
+    // Update player map with new ship
     const rows = [normalizeCoords[1], normalizeCoords[3]].sort();
     const cols = [normalizeCoords[0], normalizeCoords[2]].sort();
+    const hp = [];
     for (let i = rows[0]; i <= rows[1]; i++) {
       for (let j = cols[0]; j <= cols[1]; j++) {
         board[i][j] = 1;
+        hp.push([i, j]);
       }
     }
 
@@ -161,9 +163,11 @@ const create = async(body) => {
           headCoordinateY: normalizeCoords[1],
           tailCoordinateX: normalizeCoords[2],
           tailCoordinateY: normalizeCoords[3],
+          hp,
         }, { transaction }),
       gameplayPlayer.createOrUpdate({
         id: gameplayPlayerId,
+        status: get('status', gameplayPlayerInfo),
         playerMap: board
       }, { transaction })
     ]);

@@ -8,7 +8,7 @@ import { playerMap } from 'services';
 const router = express.Router();
 
 const isNumber = Joi.number();
-const isPositive = Joi.number().positive();
+const isPositive = Joi.number().positive().allow(0);
 
 const createPlayerDamageSchema = {
   attackerId: isNumber.required(),
