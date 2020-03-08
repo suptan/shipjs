@@ -16,11 +16,13 @@ const InvalidGameException = () => new BaseException(ERRORS.VALIDATE.INVALID_GAM
 const MapNotFoundException = () => new BaseException(ERRORS.QUERY.MAP.NOT_FOUND);
 const ShipNotFoundException = () => new BaseException(ERRORS.QUERY.SHIP.NOT_FOUND);
 const InvalidMapCoordinationException = () => new BaseException(ERRORS.VALIDATE.INVALID_MAP_COORDINATE);
+const InvalidShipPlacementException = () => new BaseException(ERRORS.VALIDATE.INVALID_SHIP_PLACEMENT);
 
 export {
   BaseException,
   InvalidGameException,
   InvalidMapCoordinationException,
+  InvalidShipPlacementException,
   LevelNotFoundException,
   LobbyEmptyException,
   MapNotFoundException,

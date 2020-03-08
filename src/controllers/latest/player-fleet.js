@@ -9,14 +9,15 @@ import { gameplayPlayer } from 'domains';
 const router = express.Router();
 
 const isNumber = Joi.number();
+const isPositive = Joi.number().positive();
 
 const createPlayerFleetSchema = {
   gameplayPlayerId: isNumber.required(),
   shipId: isNumber.required(),
-  headCoordinateX: isNumber.required(),
-  headCoordinateY: isNumber.required(),
-  tailCoordinateX: isNumber.required(),
-  tailCoordinateY: isNumber.required(),
+  headCoordinateX: isPositive.required(),
+  headCoordinateY: isPositive.required(),
+  tailCoordinateX: isPositive.required(),
+  tailCoordinateY: isPositive.required(),
 };
 
 router.get('/player-fleet', asyncWrapper(async (req, res) => {

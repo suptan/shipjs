@@ -18,6 +18,10 @@ const VALIDATE = {
   INVALID_MAP_COORDINATE: {
     statusCode: '422',
     message: 'These coordination not fit with the map'
+  },
+  INVALID_SHIP_PLACEMENT: {
+    statusCode: '422',
+    message: 'Ship cannot be place in this position'
   }
 };
 
