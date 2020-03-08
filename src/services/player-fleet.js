@@ -1,6 +1,6 @@
 import models from 'models';
 import { get, getOr, isEmpty, map } from 'lodash/fp';
-import { logInfo, logDebug } from "utils";
+import { logInfo, logDebug, createEmptyBoard } from "utils";
 import { gameplayPlayer, ship, playerFleet } from 'domains';
 import { MapNotFoundException, ShipNotFoundException, InvalidMapCoordinationException, InvalidShipPlacementException } from 'exceptions';
 import { playerFleetSerializer } from 'serializers';
@@ -82,21 +82,12 @@ const create = async(body) => {
           || Math.max(normalizeCoords[1], normalizeCoords[3]) >= gridVertical)
       throw new InvalidMapCoordinationException();
 
-    // Create a board which no ship in any cells
-    const emptyBoard = [];
-    while (emptyBoard.length < gridVertical) {
-      // deep clone array
-      const rows = [];
-      rows[gridHorizontal - 1] = 0;
-      emptyBoard.push(rows);
-    }
-    // logDebug('board', board);
-
     logDebug('len', len);
+    logDebug('gameplayPlayerInfo', gameplayPlayerInfo);
     // Fill existing ship into the board
     // TOFIX, store to DB
     // const board = await getShipOnBoard(len, fleets, emptyBoard);
-    const board = getOr(emptyBoard, 'playerMap', gameplayPlayerInfo);
+    const board = get('playerMap', gameplayPlayerInfo) || createEmptyBoard(mapInfo);
     logDebug('board with ship', board);
 
     // Place new ship into the board
@@ -118,7 +109,7 @@ const create = async(body) => {
     logDebug('left', left);
     logDebug('right', right);
     for (let i = checkCells.start; i <= checkCells.end; i++) {
-      let starboard,current, larboard;
+      let starboard, current, larboard;
       logDebug('current', `${i} || ${stableCell};;${board[i][stableCell]}`);
 
       // Ship can place here because there is a space on both starboard and larboard
