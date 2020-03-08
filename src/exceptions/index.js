@@ -13,11 +13,19 @@ const LevelNotFoundException = () => new BaseException(ERRORS.VALIDATE.LEVEL_NOT
 const LobbyEmptyException = () => new BaseException(ERRORS.VALIDATE.LOBBY_EMPTY);
 const PlayerNotJoinException = () => new BaseException(ERRORS.VALIDATE.PLAYER_NOT_JOIN);
 const InvalidGameException = () => new BaseException(ERRORS.VALIDATE.INVALID_GAME);
+const MapNotFoundException = () => new BaseException(ERRORS.QUERY.MAP.NOT_FOUND);
+const ShipNotFoundException = () => new BaseException(ERRORS.QUERY.SHIP.NOT_FOUND);
+const InvalidMapCoordinationException = () => new BaseException(ERRORS.VALIDATE.INVALID_MAP_COORDINATE);
+const InvalidShipPlacementException = () => new BaseException(ERRORS.VALIDATE.INVALID_SHIP_PLACEMENT);
 
 export {
   BaseException,
   InvalidGameException,
+  InvalidMapCoordinationException,
+  InvalidShipPlacementException,
   LevelNotFoundException,
   LobbyEmptyException,
+  MapNotFoundException,
   PlayerNotJoinException,
+  ShipNotFoundException,
 };

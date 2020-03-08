@@ -1,5 +1,6 @@
 import { transformModel } from 'utils';
 
+// TOFIX, merge level_fleets with fleets
 export default (sequelize, DataTypes) => {
   const fleets = sequelize.define('fleets', transformModel({
     amount: { type: DataTypes.INTEGER},

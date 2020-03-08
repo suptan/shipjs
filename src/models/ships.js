@@ -6,8 +6,9 @@ export default (sequelize, DataTypes) => {
     size: { type: DataTypes.INTEGER },
     status: { type: DataTypes.INTEGER }
   }), { paranoid: true });
-  ships.associate = function() {
-    // associations can be defined here
+  ships.associate = function(models) {
+    ships.hasMany(models.playerFleet, { as: 'playerFleet' });
+    ships.hasMany(models.fleet, { as: 'fleet' });
   };
   return ships;
 };

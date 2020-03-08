@@ -14,7 +14,30 @@ const VALIDATE = {
   INVALID_GAME: {
     statusCode: '422',
     message: 'This game session is not valid to join'
+  },
+  INVALID_MAP_COORDINATE: {
+    statusCode: '422',
+    message: 'These coordination not fit with the map'
+  },
+  INVALID_SHIP_PLACEMENT: {
+    statusCode: '422',
+    message: 'Ship cannot be place in this position'
   }
 };
 
-export const ERRORS = { VALIDATE };
+const QUERY = {
+  MAP: {
+    NOT_FOUND: {
+      statusCode: '400',
+      message: 'Map info not found'
+    },
+  },
+  SHIP: {
+    NOT_FOUND: {
+      statusCode: '400',
+      message: 'Ship info not found'
+    }
+  }
+};
+
+export const ERRORS = { VALIDATE, QUERY };
