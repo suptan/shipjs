@@ -24,7 +24,13 @@ const create = async ({ gameplayPlayerId, shipId, headCoordinateX, headCoordinat
   }, modelOptions);
 };
 
+const updatedSink = async (
+  playerFleetModel,
+  modelOptions = {},
+) => await playerFleetModel.update({ status: PLAYER_FLEET_STATUS.SANK }, modelOptions);
+
 export default {
   findAllByGameplayPlayerId,
   create,
+  updatedSink,
 };

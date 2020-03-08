@@ -1,7 +1,7 @@
 import models from 'models';
-import { get, map, reduce } from 'lodash/fp';
+import { find, get, map, reduce } from 'lodash/fp';
 import { logInfo, logDebug } from "utils/logger";
-import { gameplayPlayer, playerMap } from 'domains';
+import { gameplayPlayer, playerMap, playerFleet } from 'domains';
 import { GameSessionNotFoundException } from 'src/exceptions';
 import { createEmptyBoard } from 'utils';
 import PLAYER_FLEET_STATUS from 'constants/player-fleet-status';
@@ -60,10 +60,10 @@ const create = async ({
     // then update hit data to true where coordinator is matched
     // after that check all hits in array is true then sank the ship
     // Check ships damage
-    const updatedFleetsCallbacks = [];
     let confirmHit = false;
+    let sunkenShip = 0;
     map(({
-      id, status, ship: { size },
+      id, status, ship: { name, size },
       headCoordinateX, headCoordinateY, tailCoordinateX, tailCoordinateY,
     }) => {
       // Ignore damage calculation for Sunken ship
@@ -84,7 +84,11 @@ const create = async ({
 
           if(count === size) {
             logInfo('Attacker just sank a ship');
-            updatedFleetsCallbacks.push(1);
+            sunkenShip = {
+              fleetId: id,
+              name
+            };
+            return;
           }
         }
       }
@@ -92,11 +96,23 @@ const create = async ({
 
     }, playerFleets.slice(3));
 
+    if (sunkenShip) {
+      logInfo('Sank defender ship');
+      await playerFleet.updatedSink(
+        find(({ id }) => sunkenShip.fleetId === id, playerFleets),
+        { transaction }
+      );
+    }
     // When defender has no ship left, attacker win and game will end
 
+    let message = 'Miss';
+
+    if (confirmHit) {
+      message = sunkenShip ? `You just sank a ${sunkenShip.name}` : 'Hit';
+    }
+
     return {
-      message: confirmHit ? 'Hit' : 'Miss',
-      transaction
+      message,
     };
   });
 };
