@@ -20,6 +20,7 @@ const InvalidShipPlacementException = () => new BaseException(ERRORS.VALIDATE.IN
 const GameSessionNotFoundException = () => new BaseException(ERRORS.QUERY.GAMEPLAY.NOT_FOUND);
 const PlayerNotInSessionException = () => new BaseException(ERRORS.VALIDATE.PLAYER_NOT_IN_SESSION);
 const InvalidAttackAreaException = () => new BaseException(ERRORS.VALIDATE.INVALID_ATTACK_AREA);
+const StatusRequiredException = () => new BaseException(ERRORS.UPDATE.STATUS_REQUIRED);
 
 export {
   BaseException,
@@ -34,4 +35,5 @@ export {
   GameSessionNotFoundException,
   PlayerNotInSessionException,
   InvalidAttackAreaException,
+  StatusRequiredException,
 };

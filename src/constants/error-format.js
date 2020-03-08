@@ -54,4 +54,11 @@ const QUERY = {
   },
 };
 
-export const ERRORS = { VALIDATE, QUERY };
+const UPDATE = {
+  STATUS_REQUIRED: {
+    statusCode: '422',
+    message: 'status code is required'
+  }
+};
+
+export const ERRORS = { VALIDATE, QUERY, UPDATE };

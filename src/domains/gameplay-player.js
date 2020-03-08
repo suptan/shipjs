@@ -1,6 +1,6 @@
 import models from 'models';
 import { identity, map, pickBy } from 'lodash/fp';
-import { InvalidGameException } from 'exceptions';
+import { InvalidGameException, StatusRequiredException } from 'exceptions';
 import { logInfo, logDebug } from 'utils';
 import PLAYER_STATUS from 'constants/player-status';
 import GAME_STATUS from 'constants/gameplay-status';
@@ -90,6 +90,10 @@ const createOrUpdate = async ({ id, gameplayId, playerId, status, playerMap }, m
       playerMap,
     }, modelOptions);
   } else {
+    if(!status && status != 0) {
+      throw new StatusRequiredException();
+    }
+
     result = await gameplayPlayerModel.update({
       status,
       playerMap,
