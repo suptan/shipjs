@@ -23,6 +23,7 @@ services:
       POSTGRES_PORT: '5432'
       ENABLE_SWAGGER: 'true'
       SWAGGER_SECRET_KEY: 'secretKey'
+      ENABLE_LOG_DEBUG: '1'
     networks:
       - shipjs
   shipjs-postgreq:

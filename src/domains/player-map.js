@@ -30,7 +30,15 @@ const findAllByGamePlayerId = async gameplayPlayerId => await models.playerMaps.
   }
 });
 
+const findAttackAttempts = async({ gameplayPlayerId, attackerId}) => await models.playerMaps.count({
+  where: {
+    gameplayPlayerId,
+    attackerId,
+  },
+});
+
 export default {
   create,
-  findAllByGamePlayerId
+  findAllByGamePlayerId,
+  findAttackAttempts,
 };

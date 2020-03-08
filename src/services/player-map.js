@@ -1,5 +1,5 @@
 import models from 'models';
-import { find, get, map, reduce } from 'lodash/fp';
+import { filter, find, get, map, reduce } from 'lodash/fp';
 import { logInfo, logDebug } from "utils/logger";
 import { gameplayPlayer, playerMap, playerFleet } from 'domains';
 import { GameSessionNotFoundException } from 'src/exceptions';
@@ -8,7 +8,7 @@ import PLAYER_FLEET_STATUS from 'constants/player-fleet-status';
 
 const create = async ({
   gameplayPlayerId,
-  //   attackerId,
+  attackerId,
   seizedCoordinateX,
   seizedCoordinateY,
 }) => {
@@ -25,12 +25,12 @@ const create = async ({
 
     const attack = { row: seizedCoordinateY - 1, col: seizedCoordinateX - 1 };
     logDebug('Attack coordinate', attack);
-    // await playerMap.create({
-    //   gameplayPlayerId,
-    //   attackerId,
-    //   seizedCoordinateX: attack.col,
-    //   seizedCoordinateY: attack.row,
-    // }, { transaction });
+    await playerMap.create({
+      gameplayPlayerId,
+      attackerId,
+      seizedCoordinateX: attack.col,
+      seizedCoordinateY: attack.row,
+    }, { transaction });
     const mapInfo = get(['gameplay', 'level', 'map'], gameplayer);
     const playerFleets = get(['playerFleet'], gameplayer);
 
@@ -61,6 +61,7 @@ const create = async ({
     // after that check all hits in array is true then sank the ship
     // Check ships damage
     let confirmHit = false;
+    let isWinner = false;
     let sunkenShip = 0;
     map(({
       id, status, ship: { name, size },
@@ -103,11 +104,25 @@ const create = async ({
         { transaction }
       );
     }
+
     // When defender has no ship left, attacker win and game will end
+    const sankShips = filter(({ status }) => status === PLAYER_FLEET_STATUS.SANK, playerFleets);
+
+    // isWinner = sankShips.length === playerFleets.length
+    if (sankShips.length === playerFleets.length) {
+      logInfo('We have the winner');
+      isWinner = true;
+    }
+    // logDebug(map(({id,status}) => ({id,status}), playerFleets));
 
     let message = 'Miss';
 
-    if (confirmHit) {
+    if (isWinner) {
+      // The record which had been created in this connection won't be appear
+      const moves = await playerMap.findAttackAttempts({ gameplayPlayerId, attackerId });
+      message = `Win! You have completed the game in ${moves + 1} moves`;
+    }
+    else if (confirmHit) {
       message = sunkenShip ? `You just sank a ${sunkenShip.name}` : 'Hit';
     }
 
