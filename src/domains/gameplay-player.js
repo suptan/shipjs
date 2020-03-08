@@ -1,8 +1,9 @@
 import models from 'models';
-import { map } from 'lodash/fp';
+import { identity, map, pickBy } from 'lodash/fp';
 import { InvalidGameException } from 'exceptions';
 import { logInfo, logDebug } from 'utils';
-import PLAYER_STATUS from 'src/constants/player-status';
+import PLAYER_STATUS from 'constants/player-status';
+import GAME_STATUS from 'constants/gameplay-status';
 
 const bulkCreate = async ({ gameplayId, playerIds }, modelOptions = {}) => {
   logInfo('Checking game info');
@@ -67,8 +68,41 @@ const findOneWithMapAndFleetById = async id => await models.gameplayPlayer.findB
   ],
 });
 
+const findOneById = async id => await models.gameplayPlayer.findByPk(id);
+
+const createOrUpdate = async ({ id, gameplayId, playerId, status, playerMap }, modelOptions = {} ) => {
+  let result;
+  const criteria = {
+    id,
+    gameplayId,
+    playerId
+  };
+  const gameplayPlayerModel = await models.gameplayPlayer.findOne({
+    // Sequelize consider empty field as search for null
+    where: pickBy(identity, criteria),
+  });
+
+  if (!gameplayPlayerModel) {
+    result = await models.gameplayPlayer.create({
+      gameplayId,
+      playerId,
+      status: status || GAME_STATUS.PLAN,
+      playerMap,
+    }, modelOptions);
+  } else {
+    result = await gameplayPlayerModel.update({
+      status,
+      playerMap,
+    }, modelOptions);
+  }
+
+  return result;
+};
+
 export default {
   bulkCreate,
   findOneWithMapById,
   findOneWithMapAndFleetById,
+  findOneById,
+  createOrUpdate,
 };
