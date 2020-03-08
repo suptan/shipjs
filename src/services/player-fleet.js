@@ -39,6 +39,7 @@ const create = async(body) => {
     if (isEmpty(mapInfo)) throw new MapNotFoundException();
     if (isEmpty(shipInfo)) throw new ShipNotFoundException();
     // TODO, check coordinations must be matched with ship size
+    // TODO, check ship must not exceed maximum for the level
 
     // TOFIX, change to object
     const normalizeCoords = map( num => num - 1, coordinates);
@@ -86,47 +87,58 @@ const create = async(body) => {
 
     // Place new ship into the board
     const isVertical = normalizeCoords[0] === normalizeCoords[2];
-    logDebug('Is ship place on vertical', isVertical);
+    logInfo(isVertical ? 'Ship place in vertical' : 'Ship place in horizontal');
     // let firstCheckCell = 0;
     // let lastCheckCell = 0;
+    logDebug('normalizeCoords', normalizeCoords);
     const checkCells = isVertical
-      ? await getCheckCell(normalizeCoords[0], normalizeCoords[2], 0, gridHorizontal - 1)
-      : await getCheckCell(normalizeCoords[1], normalizeCoords[3], 0, gridVertical - 1);
+      ? await getCheckCell(normalizeCoords[1], normalizeCoords[3], 0, gridVertical - 1)
+      : await getCheckCell(normalizeCoords[0], normalizeCoords[2], 0, gridHorizontal - 1);
     logDebug('checkCells', checkCells);
 
     // Check that new ship is not place overlap with another ship(s)
     // and there must be a space between each of them
-    if (isVertical) {
-      logInfo('Ship place in vertical');
-    } else {
-      logInfo('Ship place in horizontal');
-      for (let i = checkCells.start; i < checkCells.end; i++) {
-        for (let j = normalizeCoords[1]; j <= normalizeCoords[3]; j++) {
-          const left = Math.max(0, j + 1);
-          const right = Math.min(gridHorizontal - 1, j - 1);
-          const starboard = get([`${i}`, `${left}`], board);
-          const larboard = get([`${i}`, `${right}`], board);
+    const stableCell = normalizeCoords[isVertical ? 0 : 1];
+    const left = Math.max(0, stableCell + 1);
+    const right = Math.min(gridHorizontal - 1, stableCell - 1);
+    logDebug('left', left);
+    logDebug('right', right);
+    for (let i = checkCells.start; i <= checkCells.end; i++) {
+      let starboard,current, larboard;
+      logDebug('current', `${i} || ${stableCell};;${board[i][stableCell]}`);
 
-          if (starboard || larboard) throw new InvalidShipPlacementException();
-
-          // Ship can place here because there is a space on both starboard and larboard
-          board[i][left] = 1;
-          board[i][right] = 1;
-        }
+      // Ship can place here because there is a space on both starboard and larboard
+      if (isVertical) {
+        starboard = get([`${i}`, `${left}`], board);
+        current = get([`${i}`, `${stableCell}`], board);
+        larboard = get([`${i}`, `${right}`], board);
+        // For debug
+        board[i][left] = 1;
+        board[i][right] = 1;
+        logDebug(board);
+      } else {
+        starboard = get([`${left}`, `${i}`], board);
+        current = get([`${stableCell}`, `${i}`], board);
+        larboard = get([`${right}`, `${i}`], board);
+        // For debug
+        board[left][i] = 1;
+        board[right][i] = 1;
+        logDebug(board);
       }
 
+      if (starboard || larboard || current) throw new InvalidShipPlacementException();
     }
 
     logInfo('The criteria for place a ship is matched');
-    return { transaction };
-    // return await playerFleet.create(
-    //   {
-    //     ...body,
-    //     headCoordinateX: normalizeCoords[0],
-    //     headCoordinateY: normalizeCoords[1],
-    //     tailCoordinateX: normalizeCoords[2],
-    //     tailCoordinateY: normalizeCoords[3],
-    //   }, { transaction });
+    // return { transaction };
+    return await playerFleet.create(
+      {
+        ...body,
+        headCoordinateX: normalizeCoords[0],
+        headCoordinateY: normalizeCoords[1],
+        tailCoordinateX: normalizeCoords[2],
+        tailCoordinateY: normalizeCoords[3],
+      }, { transaction });
   });
 };
 
