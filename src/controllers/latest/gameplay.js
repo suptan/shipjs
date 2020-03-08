@@ -3,7 +3,6 @@ import validate from 'express-validation';
 import Joi from 'joi';
 import { keys, pick } from 'lodash/fp';
 import asyncWrapper from 'middlewares/async-wrapper';
-import { level } from 'domains';
 import { gameplay } from 'services';
 
 const router = express.Router();
@@ -19,15 +18,16 @@ const createGamePlaySchema = {
   players: isArray.items(Joi.object(playerSchema)).required(),
 };
 
-router.get('/gameplay', asyncWrapper(async (req, res) => {
-  // console.log(req);
+router.get('/gameplay/:id', asyncWrapper(async (req, res) => {
+  const { id } = req.params || {};
+  const { include } = req.query || {};
 
-  const result = await level.findOneById(10);
+  const result = await gameplay.findFullGameInfoById(id, include);
   
   console.log(result);
   
-  res.send({
-    statusCode: 200,
+  res.status(!result ? 204 : 200).send({
+    data: result,
   });
 }));
 

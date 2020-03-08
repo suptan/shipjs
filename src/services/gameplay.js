@@ -46,6 +46,29 @@ const create = async ({ levelId, players }) => {
   });
 };
 
+const findFullGameInfoById = async (id, include) => {
+  const normalizeInclude = [];
+  if (include) {
+    // TOFIX, create as util
+    // if (include.includes('gameplayPlayer'))
+    if (include.includes('gameplayPlayer.playerFleet')) {
+      const modelAssociate = {
+        model: model.gameplayPlayer,
+        as: 'gameplayPlayer',
+        include: [{
+          model: model.playerFleet,
+          as: 'playerFleet',
+        }],
+      };
+      normalizeInclude.push(modelAssociate);
+    }
+  }
+  const gameInfo = await gameplay.findWithFleetsStatusById(id, normalizeInclude);
+
+  return gameInfo;
+};
+
 export default {
-  create
+  create,
+  findFullGameInfoById,
 };

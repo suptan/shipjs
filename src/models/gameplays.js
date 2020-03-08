@@ -10,7 +10,7 @@ export default (sequelize, DataTypes) => {
 
   gameplays.associate = function(models) {
     gameplays.belongsTo(models.level);
-    // gameplays.hasMany(models.)
+    gameplays.hasMany(models.gameplayPlayer, { foreignKey: 'gameplay_id', as: 'gameplayPlayer' });
   };
   return gameplays;
 };
