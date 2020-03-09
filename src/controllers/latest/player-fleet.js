@@ -9,10 +9,10 @@ import { gameplayPlayer } from 'domains';
 const router = express.Router();
 
 const isNumber = Joi.number();
-const isPositive = Joi.number().positive();
+const isPositive = Joi.number().positive().allow(0);
 
 const createPlayerFleetSchema = {
-  gameplayPlayerId: isNumber.required(),
+  defenderId: isNumber.required(),
   shipId: isNumber.required(),
   headCoordinateX: isPositive.required(),
   headCoordinateY: isPositive.required(),
@@ -29,6 +29,31 @@ router.get('/player-fleet', asyncWrapper(async (req, res) => {
   });
 }));
 
+
+/**
+ * @swagger
+ * /api/latest/player-fleet:
+ *  post:
+ *    description: create play ship location in the game
+ *    tag: [PlayerFleet]
+ *    produces:
+ *      - application/json
+ *    parameters:
+ *      - name: obj
+ *        in: body
+ *        required: true
+ *        schema:
+ *          $ref: '#/definitions/createPlayerFleet'
+ *    responses:
+ *      200:
+ *        schema:
+ *          type: object
+ *          properties:
+ *            statusCode:
+ *              type: string
+ *              enum:
+ *                - '200'
+ */
 router.post(
   '/player-fleet',
   validate({
@@ -45,3 +70,32 @@ router.post(
 );
 
 export default router;
+
+/**
+ * @swagger
+ * tags:
+ *  - name: PlayerFleet
+ * definitions:
+ *  createPlayerFleet:
+ *    type: object
+ *    required:
+ *      - defenderId
+ *      - shipId
+ *      - headCoordinateX
+ *      - headCoordinateY
+ *      - tailCoordinateX
+ *      - tailCoordinateY
+ *    properties:
+ *      defenderId:
+ *        type: integer
+ *      shipId:
+ *        type: integer
+ *      headCoordinateX:
+ *        type: integer
+ *      headCoordinateY:
+ *        type: integer
+ *      tailCoordinateX:
+ *        type: integer
+ *      tailCoordinateY:
+ *        type: integer
+ */

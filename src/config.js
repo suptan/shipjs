@@ -7,6 +7,7 @@ const { env: {
   POSTGRES_PORT,
   ENABLE_SWAGGER,
   SWAGGER_SECRET_KEY,
+  ENABLE_LOG_DEBUG,
 } } = process;
 
 export default {
@@ -18,4 +19,5 @@ export default {
   DB_HOST: POSTGRES_HOST || '127.0.0.1',
   ENABLE_SWAGGER,
   SWAGGER_SECRET_KEY,
+  ENABLE_LOG_DEBUG,
 };

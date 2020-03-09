@@ -4,6 +4,7 @@ import gameplay from './gameplay';
 import gameplayPlayer from './gameplay-player';
 import ship from './ship';
 import playerFleet from './player-fleet';
+import playerMap from './player-map';
 
 export {
   gameplay,
@@ -11,5 +12,6 @@ export {
   level,
   player,
   playerFleet,
+  playerMap,
   ship,
 };

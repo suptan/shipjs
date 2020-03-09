@@ -9,7 +9,7 @@ const findAllByGameplayPlayerId = async id => await models.playerFleet.findAll({
 });
 
 const create = async ({ gameplayPlayerId, shipId, headCoordinateX, headCoordinateY,
-  tailCoordinateX, tailCoordinateY },
+  tailCoordinateX, tailCoordinateY, hp },
   modelOptions = {}) => {
   logInfo('Create player fleet in game');
 
@@ -20,11 +20,27 @@ const create = async ({ gameplayPlayerId, shipId, headCoordinateX, headCoordinat
     headCoordinateY,
     tailCoordinateX,
     tailCoordinateY,
+    hp,
     status: PLAYER_FLEET_STATUS.LIVE,
   }, modelOptions);
 };
 
+const updatedSink = async (
+  playerFleetModel,
+  modelOptions = {},
+) => await playerFleetModel.update({ status: PLAYER_FLEET_STATUS.SANK, hp: [] }, modelOptions);
+
+const updateById = async ({ id, hp}, modelOptions = {}) => await models.playerFleet.update({
+  hp,
+},
+{
+  where: { id },
+},
+modelOptions);
+
 export default {
   findAllByGameplayPlayerId,
   create,
+  updatedSink,
+  updateById,
 };

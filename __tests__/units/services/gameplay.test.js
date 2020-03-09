@@ -38,9 +38,10 @@ describe('services/gameplay', () => {
   describe('create request', () => {
     describe('valid', () => {
       it('should return status 200 when create game by existing level and 2 valid player', async () => {
+        const players = [{ id: 1 }, { id: 2 }];
         const input = {
           levelId: 1,
-          players: [{ id: 1 }, { id: 2 }],
+          players,
         };
         const playerIds = map('id', input.players);
         const mockNewGameSession = { id: 2 };
@@ -66,7 +67,10 @@ describe('services/gameplay', () => {
         }, mockTransaction);
         expect(result).toEqual({
           id: 2,
-          players: playerIds,
+          players: {
+            attackerId: players[0].id,
+            defenderId: players[1].id,
+          },
         });
       });
     });

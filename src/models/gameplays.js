@@ -6,11 +6,11 @@ export default (sequelize, DataTypes) => {
     status: { type: DataTypes.INTEGER },
     winnerId: { type: DataTypes.INTEGER },
     playtime: { type: DataTypes.DATE },
-  }), { paranpod: true });
+  }), { paranoid: true });
 
   gameplays.associate = function(models) {
     gameplays.belongsTo(models.level);
-    // gameplays.hasMany(models.)
+    gameplays.hasMany(models.gameplayPlayer, { foreignKey: 'gameplay_id', as: 'gameplayPlayer' });
   };
   return gameplays;
 };

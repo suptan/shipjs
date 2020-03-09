@@ -1,8 +1,9 @@
 import models from 'models';
-import { map } from 'lodash/fp';
-import { InvalidGameException } from 'exceptions';
+import { identity, map, pickBy } from 'lodash/fp';
+import { InvalidGameException, StatusRequiredException } from 'exceptions';
 import { logInfo, logDebug } from 'utils';
-import PLAYER_STATUS from 'src/constants/player-status';
+import PLAYER_STATUS from 'constants/player-status';
+import GAME_STATUS from 'constants/gameplay-status';
 
 const bulkCreate = async ({ gameplayId, playerIds }, modelOptions = {}) => {
   logInfo('Checking game info');
@@ -40,7 +41,72 @@ const findOneWithMapById = async id => await models.gameplayPlayer.findByPk(id, 
   ],
 });
 
+const findOneWithMapAndFleetById = async id => await models.gameplayPlayer.findByPk(id, {
+  include: [
+    {
+      model: models.gameplay,
+      include: [
+        {
+          model: models.level,
+          include: [
+            {
+              model: models.map,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      model: models.playerFleet,
+      as: 'playerFleet',
+      include: [
+        {
+          model: models.ship,
+        },
+      ],
+    },
+  ],
+});
+
+const findOneById = async id => await models.gameplayPlayer.findByPk(id);
+
+const createOrUpdate = async ({ id, gameplayId, playerId, status, playerMap }, modelOptions = {} ) => {
+  let result;
+  const criteria = {
+    id,
+    gameplayId,
+    playerId
+  };
+  const gameplayPlayerModel = await models.gameplayPlayer.findOne({
+    // Sequelize consider empty field as search for null
+    where: pickBy(identity, criteria),
+  });
+
+  if (!gameplayPlayerModel) {
+    result = await models.gameplayPlayer.create({
+      gameplayId,
+      playerId,
+      status: status || GAME_STATUS.PLAN,
+      playerMap,
+    }, modelOptions);
+  } else {
+    if(!status && status != 0) {
+      throw new StatusRequiredException();
+    }
+
+    result = await gameplayPlayerModel.update({
+      status,
+      playerMap,
+    }, modelOptions);
+  }
+
+  return result;
+};
+
 export default {
   bulkCreate,
-  findOneWithMapById
+  findOneWithMapById,
+  findOneWithMapAndFleetById,
+  findOneById,
+  createOrUpdate,
 };

@@ -5,11 +5,13 @@ export default (sequelize, DataTypes) => {
     gameplayId: { type: DataTypes.INTEGER },
     playerId: { type: DataTypes.INTEGER },
     status: { type: DataTypes.INTEGER },
+    playerMap: { type: DataTypes.ARRAY(DataTypes.ARRAY(DataTypes.STRING)) }
   }), { paranoid: true });
 
   gameplayPlayers.associate = function(models) {
     gameplayPlayers.belongsTo(models.gameplay);
     gameplayPlayers.belongsTo(models.player);
+    gameplayPlayers.hasMany(models.playerFleet, { foreignKey: 'gameplay_player_id', as: 'playerFleet'});
   };
 
   return gameplayPlayers;

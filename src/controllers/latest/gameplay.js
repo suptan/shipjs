@@ -3,7 +3,6 @@ import validate from 'express-validation';
 import Joi from 'joi';
 import { keys, pick } from 'lodash/fp';
 import asyncWrapper from 'middlewares/async-wrapper';
-import { level } from 'domains';
 import { gameplay } from 'services';
 
 const router = express.Router();
@@ -19,25 +18,19 @@ const createGamePlaySchema = {
   players: isArray.items(Joi.object(playerSchema)).required(),
 };
 
-router.get('/gameplay', asyncWrapper(async (req, res) => {
-  // console.log(req);
-
-  const result = await level.findOneById(10);
-  
-  console.log(result);
-  
-  res.send({
-    statusCode: 200,
-  });
-}));
-
 /**
  * @swagger
- * /gameplay:
- *  post:
- *    description: create game session
+ * /api/latest/gameplay:
+ *  get:
+ *    description: get game information by id
+ *    tags: [Gameplay]
  *    produces:
  *      - application/json
+ *    parameters:
+ *      - in: path
+ *        name: id
+ *        type: integer
+ *        required: true
  *    responses:
  *      200:
  *        schema:
@@ -47,8 +40,42 @@ router.get('/gameplay', asyncWrapper(async (req, res) => {
  *              type: string
  *              enum:
  *                - '200'
- *            data:
- *              type: object
+ */
+
+router.get('/gameplay/:id', asyncWrapper(async (req, res) => {
+  const { id } = req.params || {};
+  const { include } = req.query || {};
+
+  const result = await gameplay.findFullGameInfoById(id, include);
+
+  res.status(!result ? 204 : 200).send({
+    data: result,
+  });
+}));
+
+/**
+ * @swagger
+ * /api/latest/gameplay:
+ *  post:
+ *    description: create game session
+ *    tag: [Gameplay]
+ *    produces:
+ *      - application/json
+ *    parameters:
+ *      - name: obj
+ *        in: body
+ *        required: true
+ *        schema:
+ *          $ref: '#/definitions/createGameplay'
+ *    responses:
+ *      200:
+ *        schema:
+ *          type: object
+ *          properties:
+ *            statusCode:
+ *              type: string
+ *              enum:
+ *                - '200'
  */
 router.post(
   '/gameplay',
@@ -66,3 +93,48 @@ router.post(
 );
 
 export default router;
+
+
+/**
+ * @swagger
+ * tags:
+ *  - name: Gameplay
+ * definitions:
+ *  baseGameplay:
+ *    type: object
+ *    required:
+ *      - levelId
+ *      - players
+ *    properties:
+ *      levelId:
+ *        type: integer
+ *      players:
+ *        type: array
+ *        items:
+ *          type: object
+ *          required:
+ *            - id
+ *          properties:
+ *            id:
+ *              type: integer
+ *  createGameplay:
+ *    type: object
+ *    required:
+ *      - levelId
+ *      - players
+ *    properties:
+ *      levelId:
+ *        type: integer
+ *      players:
+ *        type: array
+ *        items:
+ *          type: object
+ *          required:
+ *            - id
+ *          properties:
+ *            id:
+ *              type: integer
+ *  gameplay:
+ *    allOf:
+ *      - $ref: '#/definitions/baseGameplay'
+ */

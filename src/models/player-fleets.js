@@ -8,6 +8,7 @@ export default (sequelize, DataTypes) => {
     headCoordinateY: { type: DataTypes.INTEGER },
     tailCoordinateX: { type: DataTypes.INTEGER },
     tailCoordinateY: { type: DataTypes.INTEGER },
+    hp: { type: DataTypes.ARRAY(DataTypes.ARRAY(DataTypes.INTEGER)) },
     status: { type: DataTypes.INTEGER }
   }), { paranoid: true });
   playerFleets.associate = function(models) {

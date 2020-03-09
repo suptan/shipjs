@@ -17,6 +17,11 @@ const MapNotFoundException = () => new BaseException(ERRORS.QUERY.MAP.NOT_FOUND)
 const ShipNotFoundException = () => new BaseException(ERRORS.QUERY.SHIP.NOT_FOUND);
 const InvalidMapCoordinationException = () => new BaseException(ERRORS.VALIDATE.INVALID_MAP_COORDINATE);
 const InvalidShipPlacementException = () => new BaseException(ERRORS.VALIDATE.INVALID_SHIP_PLACEMENT);
+const GameSessionNotFoundException = () => new BaseException(ERRORS.QUERY.GAMEPLAY.NOT_FOUND);
+const PlayerNotInSessionException = () => new BaseException(ERRORS.VALIDATE.PLAYER_NOT_IN_SESSION);
+const InvalidAttackAreaException = () => new BaseException(ERRORS.VALIDATE.INVALID_ATTACK_AREA);
+const StatusRequiredException = () => new BaseException(ERRORS.UPDATE.STATUS_REQUIRED);
+const GameSessionEndException = () => new BaseException(ERRORS.VALIDATE.GAME_END);
 
 export {
   BaseException,
@@ -28,4 +33,9 @@ export {
   MapNotFoundException,
   PlayerNotJoinException,
   ShipNotFoundException,
+  GameSessionNotFoundException,
+  PlayerNotInSessionException,
+  InvalidAttackAreaException,
+  StatusRequiredException,
+  GameSessionEndException,
 };
