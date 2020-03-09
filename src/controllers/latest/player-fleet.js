@@ -29,6 +29,31 @@ router.get('/player-fleet', asyncWrapper(async (req, res) => {
   });
 }));
 
+
+/**
+ * @swagger
+ * /player-fleet:
+ *  post:
+ *    description: create play ship location in the game
+ *    tag: [PlayerFleet]
+ *    produces:
+ *      - application/json
+ *    parameters:
+ *      - name: obj
+ *        in: body
+ *        required: true
+ *        schema:
+ *          $ref: '#/definitions/createGameplay'
+ *    responses:
+ *      200:
+ *        schema:
+ *          type: object
+ *          properties:
+ *            statusCode:
+ *              type: string
+ *              enum:
+ *                - '200'
+ */
 router.post(
   '/player-fleet',
   validate({
@@ -45,3 +70,32 @@ router.post(
 );
 
 export default router;
+
+/**
+ * @swagger
+ * tags:
+ *  - name: PlayerFleet
+ * definitions:
+ *  createPlayerFleet:
+ *    type: object
+ *    required:
+ *      - gameplayPlayerId
+ *      - shipId
+ *      - headCoordinateX
+ *      - headCoordinateY
+ *      - tailCoordinateX
+ *      - tailCoordinateY
+ *    properties:
+ *      gameplayPlayerId:
+ *        type: integer
+ *      shipId:
+ *        type: integer
+ *      headCoordinateX:
+ *        type: integer
+ *      headCoordinateY:
+ *        type: integer
+ *      tailCoordinateX:
+ *        type: integer
+ *      tailCoordinateY:
+ *        type: integer
+ */
