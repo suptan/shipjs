@@ -1,5 +1,5 @@
 import models from 'models';
-import { get, getOr, isEmpty, map } from 'lodash/fp';
+import { filter, get, getOr, isEmpty, map } from 'lodash/fp';
 import { logInfo, logDebug, createEmptyBoard } from "utils";
 import { gameplayPlayer, ship, playerFleet } from 'domains';
 import { MapNotFoundException, ShipNotFoundException, InvalidMapCoordinationException, InvalidShipPlacementException } from 'exceptions';
@@ -44,20 +44,24 @@ export const getShipOnBoard = async (len, fleets, board) => {
 
 const create = async(body) => {
   logInfo('Place a ship in map');
-  const { gameplayPlayerId, shipId, headCoordinateX,
+  const { defenderId, shipId, headCoordinateX,
     headCoordinateY, tailCoordinateX, tailCoordinateY } = body;
   // TODO, check pair of x or y must be equal before process
   // headXY != tailXY unless submarine
   // all coordinations must be positive number or 0
   const normalizeCoords = [headCoordinateX, headCoordinateY, tailCoordinateX, tailCoordinateY];
 
-  if (normalizeCoords.indexOf(-1) > -1) throw new InvalidMapCoordinationException();
+  logInfo('validate request coordinate');
+  if (!isEmpty(filter(num => Math.sign(num) < 0, normalizeCoords)))
+    throw new InvalidMapCoordinationException();
+  if (normalizeCoords[0] !== normalizeCoords[2] && normalizeCoords[1] !== normalizeCoords[3])
+    throw new InvalidMapCoordinationException();
 
   return models.sequelize.transaction(async (transaction) => {
     const results = await Promise.all([
-      gameplayPlayer.findOneWithMapById(gameplayPlayerId),
+      gameplayPlayer.findOneWithMapById(defenderId),
       ship.findOneById(shipId),
-      playerFleet.findAllByGameplayPlayerId(gameplayPlayerId)
+      playerFleet.findAllByGameplayPlayerId(defenderId)
     ]);
 
     // logDebug(results);
@@ -66,11 +70,16 @@ const create = async(body) => {
     const shipInfo = get('1', results);
     const fleets = get('2', results);
     const len = getOr(0, 'length', fleets);
+    const rowDiff = Math.abs(normalizeCoords[1] - normalizeCoords[3]);
+    const colDiff = Math.abs(normalizeCoords[0] - normalizeCoords[2]);
+    const requestShipSize = Math.max(rowDiff,colDiff) + 1;
 
+    logInfo('validate request map and ship with database');
     // logDebug(mapInfo, shipInfo);
     if (isEmpty(mapInfo)) throw new MapNotFoundException();
     if (isEmpty(shipInfo)) throw new ShipNotFoundException();
-    // TODO, check coordinations must be matched with ship size
+    // check coordinations must be matched with ship size
+    if (shipInfo.size !== requestShipSize) throw new ShipNotFoundException();
     // TODO, check ship must not exceed maximum for the level
 
     const { gridHorizontal, gridVertical } = mapInfo;
@@ -78,6 +87,7 @@ const create = async(body) => {
     // const normalizeCoords = map( num => num - 1, coordinates);
     // TODO, coordination must not exceed map length
     // TOFIX, allow ship to rotate only 180 degree
+    // logDebug('normalizeCoords', normalizeCoords);
     if (Math.max(normalizeCoords[0], normalizeCoords[2]) >= gridHorizontal
           || Math.max(normalizeCoords[1], normalizeCoords[3]) >= gridVertical)
       throw new InvalidMapCoordinationException();
@@ -150,14 +160,11 @@ const create = async(body) => {
       playerFleet.create(
         {
           ...body,
-          headCoordinateX: normalizeCoords[0],
-          headCoordinateY: normalizeCoords[1],
-          tailCoordinateX: normalizeCoords[2],
-          tailCoordinateY: normalizeCoords[3],
+          gameplayPlayerId: defenderId,
           hp,
         }, { transaction }),
       gameplayPlayer.createOrUpdate({
-        id: gameplayPlayerId,
+        id: defenderId,
         status: get('status', gameplayPlayerInfo),
         playerMap: board
       }, { transaction })

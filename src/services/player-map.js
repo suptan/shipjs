@@ -2,8 +2,9 @@ import models from 'models';
 import { filter, find, get, isEmpty, isEqual, map, values } from 'lodash/fp';
 import { logInfo, logDebug } from "utils/logger";
 import { gameplayPlayer, playerMap, playerFleet } from 'domains';
-import { GameSessionNotFoundException } from 'src/exceptions';
+import { GameSessionNotFoundException, GameSessionEndException } from 'src/exceptions';
 import PLAYER_FLEET_STATUS from 'constants/player-fleet-status';
+import GAME_STATUS from 'constants/gameplay-status';
 
 const create = async ({
   defenderId,
@@ -13,6 +14,8 @@ const create = async ({
 }) => {
   logInfo('Create a record of enemy damage');
 
+  // TODO, defender and attacker must be different
+
   return models.sequelize.transaction(async (transaction) => {
     const defender = await gameplayPlayer.findOneWithMapAndFleetById(defenderId);
 
@@ -20,12 +23,18 @@ const create = async ({
     // TODO, check player profile
     // TODO, check attack coordinate in map area and positive or 0
     // TODO, check attacker turn
-    // TODO, check game plan phase should end before attack start
+    const { gameplay } = defender;
+
+    if (gameplay.status === GAME_STATUS.END)
+      throw new GameSessionEndException();
+    // TODO, game should be in battle phase (the defender already place all ships)
+    // before attacker begin
+
 
     const attack = { row: seizedCoordinateY, col: seizedCoordinateX };
     logDebug('Attack coordinate', attack);
     await playerMap.create({
-      gameplayPlayerId: defenderId,
+      defenderId,
       attackerId,
       seizedCoordinateX: attack.col,
       seizedCoordinateY: attack.row,
@@ -115,7 +124,10 @@ const create = async ({
 
     if (isWinner) {
       // The record which had been created in this connection won't be appear
-      const moves = await playerMap.findAttackAttempts({ attackerId });
+      const [moves] = await Promise.all([
+        playerMap.findAttackAttempts({ attackerId }),
+        gameplay.update({ winnerId: attackerId, status: GAME_STATUS.END }, { transaction }),
+      ]);
       message = `Win! You have completed the game in ${moves + 1} moves`;
     }
     else if (confirmHit) {

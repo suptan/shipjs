@@ -19,7 +19,7 @@ const createPlayerDamageSchema = {
 
 /**
  * @swagger
- * /player-map:
+ * /api/latest/player-map:
  *  post:
  *    description: create attacker action and calculate defender damage
  *    tag: [PlayerMap]
@@ -30,7 +30,7 @@ const createPlayerDamageSchema = {
  *        in: body
  *        required: true
  *        schema:
- *          $ref: '#/definitions/createPlayer'
+ *          $ref: '#/definitions/createPlayerMap'
  *    responses:
  *      200:
  *        schema:
@@ -63,7 +63,7 @@ export default router;
  * tags:
  *  - name: PlayerFleet
  * definitions:
- *  createPlayerFleet:
+ *  createPlayerMap:
  *    type: object
  *    required:
  *      - attackerId

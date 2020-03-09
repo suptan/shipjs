@@ -12,7 +12,7 @@ const isNumber = Joi.number();
 const isPositive = Joi.number().positive().allow(0);
 
 const createPlayerFleetSchema = {
-  gameplayPlayerId: isNumber.required(),
+  defenderId: isNumber.required(),
   shipId: isNumber.required(),
   headCoordinateX: isPositive.required(),
   headCoordinateY: isPositive.required(),
@@ -32,7 +32,7 @@ router.get('/player-fleet', asyncWrapper(async (req, res) => {
 
 /**
  * @swagger
- * /player-fleet:
+ * /api/latest/player-fleet:
  *  post:
  *    description: create play ship location in the game
  *    tag: [PlayerFleet]
@@ -43,7 +43,7 @@ router.get('/player-fleet', asyncWrapper(async (req, res) => {
  *        in: body
  *        required: true
  *        schema:
- *          $ref: '#/definitions/createGameplay'
+ *          $ref: '#/definitions/createPlayerFleet'
  *    responses:
  *      200:
  *        schema:
@@ -79,14 +79,14 @@ export default router;
  *  createPlayerFleet:
  *    type: object
  *    required:
- *      - gameplayPlayerId
+ *      - defenderId
  *      - shipId
  *      - headCoordinateX
  *      - headCoordinateY
  *      - tailCoordinateX
  *      - tailCoordinateY
  *    properties:
- *      gameplayPlayerId:
+ *      defenderId:
  *        type: integer
  *      shipId:
  *        type: integer

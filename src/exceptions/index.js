@@ -21,6 +21,7 @@ const GameSessionNotFoundException = () => new BaseException(ERRORS.QUERY.GAMEPL
 const PlayerNotInSessionException = () => new BaseException(ERRORS.VALIDATE.PLAYER_NOT_IN_SESSION);
 const InvalidAttackAreaException = () => new BaseException(ERRORS.VALIDATE.INVALID_ATTACK_AREA);
 const StatusRequiredException = () => new BaseException(ERRORS.UPDATE.STATUS_REQUIRED);
+const GameSessionEndException = () => new BaseException(ERRORS.VALIDATE.GAME_END);
 
 export {
   BaseException,
@@ -36,4 +37,5 @@ export {
   PlayerNotInSessionException,
   InvalidAttackAreaException,
   StatusRequiredException,
+  GameSessionEndException,
 };

@@ -20,7 +20,7 @@ const createGamePlaySchema = {
 
 /**
  * @swagger
- * /gameplay:
+ * /api/latest/gameplay:
  *  get:
  *    description: get game information by id
  *    tags: [Gameplay]
@@ -55,7 +55,7 @@ router.get('/gameplay/:id', asyncWrapper(async (req, res) => {
 
 /**
  * @swagger
- * /gameplay:
+ * /api/latest/gameplay:
  *  post:
  *    description: create game session
  *    tag: [Gameplay]

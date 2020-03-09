@@ -41,7 +41,10 @@ const create = async ({ levelId, players }) => {
 
     return {
       id: newGameplay.id,
-      players: map('playerId', gamePlayer)
+      players: {
+        attackerId: get(['0', 'id'], gamePlayer),
+        defenderId: get(['1', 'id'], gamePlayer),
+      },
     };
   });
 };

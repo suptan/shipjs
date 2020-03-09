@@ -8,8 +8,8 @@ export default (sequelize, DataTypes) => {
     seizedCoordinateY: { type: DataTypes.INTEGER },
   }), { paranoid: true });
   playerMaps.associate = function(models) {
-    playerMaps.belongsTo(models.player, { foreignKey: 'attacker_id', as: 'player' });
-    playerMaps.belongsTo(models.player, { foreignKey: 'defender_id', as: 'player' });
+    playerMaps.belongsTo(models.player, { foreignKey: 'attacker_id', as: 'attacker' });
+    playerMaps.belongsTo(models.player, { foreignKey: 'defender_id', as: 'defender' });
   };
   return playerMaps;
 };

@@ -25,11 +25,15 @@ const VALIDATE = {
   },
   PLAYER_NOT_IN_SESSION: {
     statusCode: '422',
-    message: 'player not in this session'
+    message: 'Player not in this session'
   },
   INVALID_ATTACK_AREA: {
     statusCode: '422',
-    message: 'this area cannot be attack'
+    message: 'This area cannot be attack'
+  },
+  GAME_END: {
+    statusCode: '422',
+    message: 'Game session already end, please start again'
   }
 };
 
