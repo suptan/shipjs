@@ -39,4 +39,8 @@ app.get('/api-docs.json', (req, res) => {
   res.send(swaggerSpec);
 });
 
-app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+if (config.NODE_ENV !== 'test') {
+  app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+}
+
+export { app };

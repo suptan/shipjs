@@ -51,7 +51,7 @@ services:
   test-e2e:
     build: .
     image: assign/test-e2e-shipjs
-    command: npm run e2e-test:watch
+    command: npm run e2e-test
     volumes:
       - '.:/usr/src/app'
       -  shipjs-node_modules:/usr/src/app/node_modules
@@ -60,12 +60,13 @@ services:
     depends_on:
       - test-shipjs-postgreq
     environment:
-      NODE_ENV: 'development'
+      NODE_ENV: 'test'
       POSTGRES_USER: 'api'
       POSTGRES_PASSWORD: 'api'
       POSTGRES_DB: 'test-shipjs'
       POSTGRES_HOST: 'test-shipjs-postgreq'
       POSTGRES_PORT: '5432'
+      DB_SERVICE: 'test-shipjs-postgreq'
   test-shipjs-postgreq:
     image: postgres:11
     volumes:

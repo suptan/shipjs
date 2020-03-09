@@ -1,4 +1,5 @@
 const { env: {
+  NODE_ENV,
   PORT,
   POSTGRES_USER,
   POSTGRES_PASSWORD,
@@ -11,6 +12,7 @@ const { env: {
 } } = process;
 
 export default {
+  NODE_ENV: NODE_ENV || 'development',
   PORT: PORT || 8080,
   DB_USER: POSTGRES_USER || 'api',
   DB_PASSWORD: POSTGRES_PASSWORD || 'api',
