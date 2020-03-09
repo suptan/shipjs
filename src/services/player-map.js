@@ -89,7 +89,7 @@ const create = async ({
           hp: calHp,
         };
       }
-    }, playerFleets.slice(3));
+    }, playerFleets);
 
     // Attacker either damage or sank the ship
     if (sunkenShip) {
