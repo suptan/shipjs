@@ -6,7 +6,7 @@ import { GameSessionNotFoundException } from 'src/exceptions';
 import PLAYER_FLEET_STATUS from 'constants/player-fleet-status';
 
 const create = async ({
-  gameplayPlayerId,
+  defenderId,
   attackerId,
   seizedCoordinateX,
   seizedCoordinateY,
@@ -14,9 +14,9 @@ const create = async ({
   logInfo('Create a record of enemy damage');
 
   return models.sequelize.transaction(async (transaction) => {
-    const gameplayer = await gameplayPlayer.findOneWithMapAndFleetById(gameplayPlayerId);
+    const defender = await gameplayPlayer.findOneWithMapAndFleetById(defenderId);
 
-    if (!gameplayer) throw new GameSessionNotFoundException();
+    if (!defender) throw new GameSessionNotFoundException();
     // TODO, check player profile
     // TODO, check attack coordinate in map area and positive or 0
     // TODO, check attacker turn
@@ -25,12 +25,12 @@ const create = async ({
     const attack = { row: seizedCoordinateY, col: seizedCoordinateX };
     logDebug('Attack coordinate', attack);
     await playerMap.create({
-      gameplayPlayerId,
+      gameplayPlayerId: defenderId,
       attackerId,
       seizedCoordinateX: attack.col,
       seizedCoordinateY: attack.row,
     }, { transaction });
-    const playerFleets = get(['playerFleet'], gameplayer);
+    const playerFleets = get(['playerFleet'], defender);
 
     // After the attack
     //   - Attacker turn end and switch to defender
@@ -42,7 +42,7 @@ const create = async ({
 
 
     // Fill board damage
-    const seizedBoard = gameplayer.playerMap;
+    const seizedBoard = defender.playerMap;
     logDebug('seizedBoard', seizedBoard);
 
     // TOFIX, store ship location as an array of object with coordinator and hit,
@@ -57,7 +57,7 @@ const create = async ({
 
     // Update player map info
     seizedBoard[attack.row][attack.col] = 2;
-    const updateMap = gameplayer.update({ playerMap: seizedBoard }, { transaction });
+    const updateMap = defender.update({ playerMap: seizedBoard }, { transaction });
 
     // Check ship status
     map(({
@@ -115,7 +115,7 @@ const create = async ({
 
     if (isWinner) {
       // The record which had been created in this connection won't be appear
-      const moves = await playerMap.findAttackAttempts({ gameplayPlayerId, attackerId });
+      const moves = await playerMap.findAttackAttempts({ attackerId });
       message = `Win! You have completed the game in ${moves + 1} moves`;
     }
     else if (confirmHit) {
