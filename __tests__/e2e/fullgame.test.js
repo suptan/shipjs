@@ -255,6 +255,13 @@ describe('full game', () => {
         },
       })
     );
+    const cruisers = await models.default.playerFleet.findAll({
+      where: {
+        shipId: 2,
+        gameplayPlayerId: 2,
+      },
+    });
+    expect(cruisers.length).toEqual(2);
   });
 
   it('should be able to place destroyers', async () => {
@@ -535,6 +542,78 @@ describe('full game', () => {
         const testing = await models.default.playerMaps.findAll({ where: { seizedCoordinateX: 3, seizedCoordinateY: 3 }});
         console.log(testing.length);
         expect(res.statusCode).toEqual(500);
+      });
+      it('should be able to retrieve game state which 6 ships sunk', async () => {
+        const res = await request(app).get('/api/latest/gameplay/1?include=gameplayPlayer.playerFleet');
+        const {
+          body: {
+            data: {
+              winnerId, gameplayPlayer,
+            },
+          },
+        } = res;
+        const attacker = gameplayPlayer.find(({ id }) => id === 1);
+        const defender = gameplayPlayer.find(({ id }) => id === 2);
+        const battleship = defender.playerFleet.filter(({ shipId }) => shipId === 1);
+        const cruisers = defender.playerFleet.filter(({ shipId }) => shipId === 2);
+        const destroyers = defender.playerFleet.filter(({ shipId }) => shipId === 3);
+        const submarines = defender.playerFleet.filter(({ shipId }) => shipId === 4);
+        expect(winnerId).toBeNull();
+        expect(gameplayPlayer).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({ playerId: 1 }),
+            expect.objectContaining({ playerId: 2 }),
+          ])
+        );
+        expect(attacker.playerMap).toBeNull();
+        expect(attacker.playerFleet).toEqual([]);
+        // console.log(defender.playerFleet);
+
+        expect(battleship.length).toEqual(1);
+        expect(battleship[0]).toEqual(
+          expect.objectContaining({ shipId: 1, hp: [], status: 2 })
+        );
+        expect(cruisers).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({ shipId: 2, hp: [], status: 2 }),
+            expect.objectContaining({ shipId: 2, hp: [], status: 2 })
+          ])
+        );
+        expect(destroyers).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({
+              shipId: 3, hp: [[7, 1], [8, 1]], status: 0,
+              tailCoordinateX: 1, tailCoordinateY: 7,
+              headCoordinateX: 1, headCoordinateY: 8,
+            }),
+            expect.objectContaining({
+              shipId: 3, hp: [[7, 3], [7, 4]], status: 0,
+              tailCoordinateX: 4, tailCoordinateY: 7,
+              headCoordinateX: 3, headCoordinateY: 7,
+            }),
+            expect.objectContaining({
+              shipId: 3, hp: [], status: 2,
+              tailCoordinateX: 1, tailCoordinateY: 4,
+              headCoordinateX: 2, headCoordinateY: 4,
+            })
+          ])
+        );
+        expect(submarines).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({ shipId: 4, hp: [[9, 9]], status: 0 }),
+            expect.objectContaining({ shipId: 4, hp: [[9, 7]], status: 0 }),
+            expect.objectContaining({
+              shipId: 4, hp: [], status: 2,
+              tailCoordinateX: 9, tailCoordinateY: 4,
+              headCoordinateX: 9, headCoordinateY: 4,
+            }),
+            expect.objectContaining({
+              shipId: 4, hp: [], status: 2,
+              tailCoordinateX: 4, tailCoordinateY: 1,
+              headCoordinateX: 4, headCoordinateY: 1,
+            })
+          ])
+        );
       });
       it('should be able to attack last half of the map', async () => {
         for (let i = 0; i < 10; i++) {
