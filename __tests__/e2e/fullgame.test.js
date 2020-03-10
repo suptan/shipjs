@@ -128,7 +128,42 @@ describe('full game', () => {
             defenderId: 2
           },
         },
-        statusCode: expect.any(String)
+        statusCode: '200'
+      })
+    );
+  });
+
+  it('should be able to place a battleship', async () => {
+    const {
+      default: {
+        ship: shipModel,
+      }
+    } = models;
+    const battleship = await shipModel.findOne({
+      where: { name: 'Battleship' }
+    });
+
+    const defenderId = 2;
+    const reqBody = {
+      shipId: battleship.id,
+      headCoordinateX: 4,
+      headCoordinateY: 4,
+      tailCoordinateX: 7,
+      tailCoordinateY: 4,
+    };
+    const res = await request(app)
+      .post('/api/latest/player-fleet')
+      .send({ ...reqBody, defenderId });
+    expect(res.statusCode).toEqual(200);
+    expect(res.body).toEqual(
+      expect.objectContaining({
+        statusCode: '200',
+        data: {
+          playerFleet: expect.objectContaining({
+            ...reqBody,
+            gameplayPlayerId: defenderId,
+          }),
+        },
       })
     );
   });
