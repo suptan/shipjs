@@ -101,4 +101,35 @@ describe('full game', () => {
       expect.arrayContaining(demoLevelFleets.map(a => expect.objectContaining(a)))
     );
   });
+
+  it('should be able to create a new game', async () => {
+    const {
+      default: {
+        level: levelModel, player: playerModel
+      }
+    } = models;
+    const [levels, players] = await Promise.all([
+      levelModel.findAll(),
+      playerModel.findAll()
+    ]);
+    const res = await request(app)
+      .post('/api/latest/gameplay')
+      .send({
+        levelId: levels[0].id,
+        players: players.map(player => ({ id: player.id})),
+      });
+    expect(res.status).toEqual(200);
+    expect(res.body).toEqual(
+      expect.objectContaining({
+        data: {
+          id: 1,
+          players: {
+            attackerId: 1,
+            defenderId: 2
+          },
+        },
+        statusCode: expect.any(String)
+      })
+    );
+  });
 });
