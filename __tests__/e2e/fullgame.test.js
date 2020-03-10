@@ -3,6 +3,20 @@ const { app } = require('../../src');
 const models = require('models');
 const { ERRORS } = require('constants/error-format');
 
+const getDefenderFleet = (gameplayPlayer) => {
+  const attacker = gameplayPlayer.find(({ id }) => id === 1);
+  const defender = gameplayPlayer.find(({ id }) => id === 2);
+  const battleships = defender.playerFleet.filter(({ shipId }) => shipId === 1);
+  const cruisers = defender.playerFleet.filter(({ shipId }) => shipId === 2);
+  const destroyers = defender.playerFleet.filter(({ shipId }) => shipId === 3);
+  const submarines = defender.playerFleet.filter(({ shipId }) => shipId === 4);
+
+  return {
+    attacker, defender,
+    battleships, cruisers, destroyers, submarines,
+  };
+};
+
 describe('full game', () => {
   beforeAll(async done => {
     await models.default.sequelize.sync({ force: true, logging: false });
@@ -552,12 +566,10 @@ describe('full game', () => {
             },
           },
         } = res;
-        const attacker = gameplayPlayer.find(({ id }) => id === 1);
-        const defender = gameplayPlayer.find(({ id }) => id === 2);
-        const battleship = defender.playerFleet.filter(({ shipId }) => shipId === 1);
-        const cruisers = defender.playerFleet.filter(({ shipId }) => shipId === 2);
-        const destroyers = defender.playerFleet.filter(({ shipId }) => shipId === 3);
-        const submarines = defender.playerFleet.filter(({ shipId }) => shipId === 4);
+        const {
+          attacker,
+          battleships, cruisers, destroyers, submarines,
+        } = getDefenderFleet(gameplayPlayer);
         expect(winnerId).toBeNull();
         expect(gameplayPlayer).toEqual(
           expect.arrayContaining([
@@ -569,15 +581,16 @@ describe('full game', () => {
         expect(attacker.playerFleet).toEqual([]);
         // console.log(defender.playerFleet);
 
-        expect(battleship.length).toEqual(1);
-        expect(battleship[0]).toEqual(
+        expect(battleships.length).toEqual(1);
+        expect(battleships[0]).toEqual(
           expect.objectContaining({ shipId: 1, hp: [], status: 2 })
         );
         expect(cruisers).toEqual(
-          expect.arrayContaining([
-            expect.objectContaining({ shipId: 2, hp: [], status: 2 }),
-            expect.objectContaining({ shipId: 2, hp: [], status: 2 })
-          ])
+          expect.arrayContaining(
+            new Array(destroyers.length).fill(
+              expect.objectContaining({ shipId: 2, hp: [], status: 2 })
+            )
+          )
         );
         expect(destroyers).toEqual(
           expect.arrayContaining([
@@ -654,6 +667,34 @@ describe('full game', () => {
             );
           }
         }
+      });
+      it('should be able to retrieve end game state which all ships sunk', async () => {
+        const res = await request(app).get('/api/latest/gameplay/1?include=gameplayPlayer.playerFleet');
+        const {
+          body: {
+            data: {
+              winnerId, gameplayPlayer,
+            },
+          },
+        } = res;
+        const {
+          attacker, destroyers, submarines,
+        } = getDefenderFleet(gameplayPlayer);
+        expect(winnerId).toEqual(attacker.id);
+        expect(destroyers).toEqual(
+          expect.arrayContaining(
+            new Array(destroyers.length).fill(
+              expect.objectContaining({ shipId: 3, hp: [], status: 2 })
+            )
+          )
+        );
+        expect(submarines).toEqual(
+          expect.arrayContaining(
+            new Array(submarines.length).fill(
+              expect.objectContaining({ shipId: 4, hp: [], status: 2 })
+            )
+          )
+        );
       });
     });
   });
