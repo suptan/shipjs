@@ -141,7 +141,10 @@ const create = async(body) => {
         // logDebug(board);
       }
 
-      if (starboard || larboard || current) throw new InvalidShipPlacementException();
+      if (starboard || larboard || current) {
+        console.log('foo', !!starboard , !!larboard , !!current);
+        throw new InvalidShipPlacementException();}
+      console.log('next');
     }
 
     logInfo('The criteria for place a ship is matched');
