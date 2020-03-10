@@ -4,12 +4,13 @@ const models = require('models');
 
 describe('full game', () => {
   beforeAll(async done => {
-    models.default.sequelize.sync({ force: true, logging: false }).then(() => {
-      models.default.sequelize.close();
-    });
+    await models.default.sequelize.sync({ force: true, logging: false });
     app.listen(done);
+    // seed data
   });
   afterAll((done) => {
+    models.default.sequelize.close();
+
     app.close(done);
   });
 
@@ -19,38 +20,46 @@ describe('full game', () => {
     expect(res.body.databaseConnection).toEqual('UP');
   });
 
-  //   describe('2 players, attacker & defender', () => {
-  //     beforeEach(async () => {
-  //       // Seed data
-  //     //   await models.map.bulkInsert('maps', [{
-  //     //     name: 'demo',
-  //     //     grid_horizontal: 10,
-  //     //     grid_vertical: 10,
-  //     //     status: 1,
-  //     //     created_at: new Date(),
-  //     //     updated_at: new Date()
-  //     //   }]);
+  it('should have map and players before start', async () => {
+    const {
+      default: {
+        map: mapModel,
+        player: playerModel,
+      }
+    } = models;
 
-  //       console.log(models.player);
-      
-  //       await models.player.bulkInsert([{
-  //         name: 'atk',
-  //         status: 1,
-  //         created_at: new Date(),
-  //         updated_at: new Date()
-  //       }, {
-  //         name: 'def',
-  //         status: 1,
-  //         created_at: new Date(),
-  //         updated_at: new Date()
-  //       }]);
-  //     });
-  //     it('should return how many times attackers use to sank all ships', async () => {
-  //       const players = await models.player.findAll();
+    const demoMap = {
+      name: 'oasis',
+      gridHorizontal: 10,
+      gridVertical: 10,
+      status: 1,
+    };
+    const readyPlayer1 = { name: 'Wade' };
+    const readyPlayer2 = { name: 'Mark' };
+    const [readyMap, readyPlayers] = await Promise.all([
+      mapModel.create(demoMap),
+      playerModel.bulkInsert([readyPlayer1, readyPlayer2])
+    ]);
+    console.log('readyMap', readyMap);
+    expect(readyMap).toEqual(
+      expect.objectContaining(demoMap)
+    );
+    expect(readyPlayers).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining(readyPlayer1),
+        expect.objectContaining(readyPlayer2),
+      ])
+    );
+  });
 
-  //       console.log(players);
-      
-//       expect(players).toBe(2);
-//     });
-//   });
+  // it('should have game level before start', async () => {
+  //   const {
+  //     default: {
+  //       map: mapModel, ship: shipModel, fleet: fleetModel, level: levelModel,
+  //       levelFleet: leveleFleetModel,
+  //     }
+  //   } = models;
+
+    
+  // });
 });

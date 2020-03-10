@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-  up: (queryInterface, Sequelize) => {
+  up: async (queryInterface) => {
     /*
       Add altering commands here.
       Return a promise to correctly handle asynchronicity.
@@ -12,12 +12,15 @@ module.exports = {
         isBetaMember: false
       }], {});
     */
-    return queryInterface.bulkInsert('maps', [{
-      name: 'demo',
-      gridHorizontal: 10,
-      gridVertical: 10,
-      status: 1
-    }]);
+    const players = await queryInterface.rawSelect('players');
+
+    if (!players && players.length < 2) {
+      await queryInterface.bulkInsert('players', [{
+        name: 'defender'
+      },{
+        name: 'attacker'
+      }]);
+    }
   },
 
   down: (queryInterface, Sequelize) => {
@@ -28,6 +31,6 @@ module.exports = {
       Example:
       return queryInterface.bulkDelete('People', null, {});
     */
-    return queryInterface.bulkDelete('maps', null, {});
+    return queryInterface.bulkDelete('ships', null, {});
   }
 };
