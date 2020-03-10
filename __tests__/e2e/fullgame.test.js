@@ -403,10 +403,10 @@ describe('full game', () => {
     });
 
     const place4th = {
-      headCoordinateX: 4,
-      headCoordinateY: 9,
-      tailCoordinateX: 4,
-      tailCoordinateY: 9,
+      headCoordinateX: 9,
+      headCoordinateY: 4,
+      tailCoordinateX: 9,
+      tailCoordinateY: 4,
     };
     const res4th = await request(app)
       .post('/api/latest/player-fleet')
@@ -470,5 +470,112 @@ describe('full game', () => {
         },
       })
     );
+  });
+
+  describe('attacking', () => {
+    describe('invalid coordination', () => {});
+    describe('valid coordination', () => {
+      it('should be able to attack first half of the map', async () => {
+        for (let i = 0; i < 10; i++) {
+          for (let j = 0; j < 5; j++) {
+            const res = await request(app)
+              .post('/api/latest/player-map')
+              .send({
+                attackerId: 1,
+                defenderId: 2,
+                seizedCoordinateX: i,
+                seizedCoordinateY: j,
+              });
+            expect(res.statusCode).toEqual(200);
+            let message = 'Miss';
+            // Hit 1st cruiser
+            if (i === 0 && ([0, 1, 2].indexOf(j) > -1)) {
+              message = j === 2 ? 'You just sank a Cruiser' : 'Hit';
+            }
+            // Hit 2nd cruiser
+            else if (j === 0 && ([7, 8, 9].indexOf(i) > -1)) {
+              message = i === 9 ? 'You just sank a Cruiser' : 'Hit';
+            }
+            // Hit 1st submarine
+            else if (j === 1 && i === 4) {
+              console.log('sank 1st submarine');
+              message = 'You just sank a Submarine';
+            }
+            // Hit 2nd submarine
+            else if (j === 4 && i === 9) {
+              console.log('sank 2nd submarine');
+              message = 'You just sank a Submarine';
+            }
+            // Hit 1st destroyer
+            else if (j === 4 && ([1, 2].indexOf(i) > -1)) {
+              message = i === 2 ? 'You just sank a Destroyer' : 'Hit';
+            }
+            // Hit battleship
+            else if (j === 4 && ([4, 5, 6, 7].indexOf(i) > -1)) {
+              message = i === 7 ? 'You just sank a Battleship' : 'Hit';
+            }
+            expect(res.body).toEqual(
+              expect.objectContaining({
+                statusCode: '200',
+                data: expect.objectContaining({ message })
+              })
+            );
+          }
+        }
+      });
+      it.skip('should not be able to attack same cell twice', async () => {
+        const res = await request(app)
+          .post('/api/latest/player-map')
+          .send({
+            attackerId: 1,
+            defenderId: 2,
+            seizedCoordinateX: 3,
+            seizedCoordinateY: 3,
+          });
+        const testing = await models.default.playerMaps.findAll({ where: { seizedCoordinateX: 3, seizedCoordinateY: 3 }});
+        console.log(testing.length);
+        expect(res.statusCode).toEqual(500);
+      });
+      it('should be able to attack last half of the map', async () => {
+        for (let i = 0; i < 10; i++) {
+          for (let j = 5; j < 10; j++) {
+            const res = await request(app)
+              .post('/api/latest/player-map')
+              .send({
+                attackerId: 1,
+                defenderId: 2,
+                seizedCoordinateX: i,
+                seizedCoordinateY: j,
+              });
+            expect(res.statusCode).toEqual(200);
+            let message = 'Miss';
+            // Hit 2nd destroyer
+            if (i === 1 && ([7, 8].indexOf(j) > -1)) {
+              message = j === 8 ? 'You just sank a Destroyer' : 'Hit';
+            }
+            // Hit 3rd destroyer
+            else if (j === 7 && ([3, 4].indexOf(i) > -1)) {
+              message = i === 4 ? 'You just sank a Destroyer' : 'Hit';
+            }
+            // Hit 3rd submarine
+            else if (j === 9 && i === 7) {
+              console.log('sank 3rd submarine');
+              message = 'You just sank a Submarine';
+            }
+            // Hit 4th submarine, last ship, game will end
+            else if (j === 9 && i === 9) {
+              console.log('sank 4th (last) submarine');
+              message = 'Win! You have completed the game in 100 moves';
+            }
+            expect(res.body).toEqual(
+              expect.objectContaining({
+                statusCode: '200',
+                data: expect.objectContaining({ message })
+              })
+            );
+          }
+        }
+      });
+    });
   });
 });
