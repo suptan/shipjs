@@ -38,9 +38,8 @@ describe('full game', () => {
     const readyPlayer2 = { name: 'Mark' };
     const [readyMap, readyPlayers] = await Promise.all([
       mapModel.create(demoMap),
-      playerModel.bulkInsert([readyPlayer1, readyPlayer2])
+      playerModel.bulkCreate([readyPlayer1, readyPlayer2])
     ]);
-    console.log('readyMap', readyMap);
     expect(readyMap).toEqual(
       expect.objectContaining(demoMap)
     );
@@ -52,14 +51,54 @@ describe('full game', () => {
     );
   });
 
-  // it('should have game level before start', async () => {
-  //   const {
-  //     default: {
-  //       map: mapModel, ship: shipModel, fleet: fleetModel, level: levelModel,
-  //       levelFleet: leveleFleetModel,
-  //     }
-  //   } = models;
+  it('should have game level before start', async () => {
+    const {
+      default: {
+        map: mapModel, ship: shipModel, fleet: fleetModel, level: levelModel,
+        levelFleet: levelFleetModel,
+      }
+    } = models;
+    const battle = { name: 'Battleship', size: 4, status: 1 };
+    const cruise = { name: 'Cruiser', size: 3, status: 1 };
+    const destroy = { name: 'Destroyer', size: 2, status: 1 };
+    const sub = { name: 'Submarine', size: 1, status: 1 };
 
-    
-  // });
+    const [maps, ships] = await Promise.all([
+      mapModel.findAll(),
+      shipModel.bulkCreate([battle, cruise, destroy, sub])
+    ]);
+    expect(ships).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining(battle),
+        expect.objectContaining(cruise),
+        expect.objectContaining(destroy),
+        expect.objectContaining(sub),
+      ])
+    );
+
+    const battleFleet = { shipId: ships[0].id, amount: 1, status: 1 };
+    const cruiseFleet = { shipId: ships[1].id, amount: 2, status: 1 };
+    const destroyFleet = { shipId: ships[2].id, amount: 3, status: 1 };
+    const subFleet = { shipId: ships[3].id, amount: 4, status: 1 };
+    const fleets = await fleetModel.bulkCreate([battleFleet, cruiseFleet, destroyFleet, subFleet]);
+    expect(fleets).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining(battleFleet),
+        expect.objectContaining(cruiseFleet),
+        expect.objectContaining(destroyFleet),
+        expect.objectContaining(subFleet),
+      ])
+    );
+
+    const mapFirst = maps[0];
+    const demoLevel = { mapId: mapFirst.id, status: 1 };
+    const level = await levelModel.create(demoLevel);
+    expect(level).toEqual(expect.objectContaining(demoLevel));
+
+    const demoLevelFleets = fleets.map(fleet => ({ levelId: level.id, fleetId: fleet.id, status: 1 }));
+    const levelFleet = await levelFleetModel.bulkCreate(demoLevelFleets);
+    expect(levelFleet).toEqual(
+      expect.arrayContaining(demoLevelFleets.map(a => expect.objectContaining(a)))
+    );
+  });
 });
