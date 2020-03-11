@@ -14,9 +14,11 @@ module.exports = {
     */
     return queryInterface.bulkInsert('maps', [{
       name: 'demo',
-      gridHorizontal: 10,
-      gridVertical: 10,
-      status: 1
+      grid_horizontal: 10,
+      grid_vertical: 10,
+      status: 1,
+      created_at: new Date(),
+      updated_at: new Date()
     }]);
   },
 

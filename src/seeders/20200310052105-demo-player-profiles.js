@@ -2,35 +2,24 @@
 
 module.exports = {
   up: async (queryInterface) => {
-    /*
-      Add altering commands here.
-      Return a promise to correctly handle asynchronicity.
+    const rawQuery = await queryInterface.sequelize.query('select id from players');
+    const players = rawQuery[0];
+    console.log(rawQuery, players);
 
-      Example:
-      return queryInterface.bulkInsert('People', [{
-        name: 'John Doe',
-        isBetaMember: false
-      }], {});
-    */
-    const players = await queryInterface.rawSelect('players');
-
-    if (!players && players.length < 2) {
+    if (players.length < 2) {
       await queryInterface.bulkInsert('players', [{
-        name: 'defender'
+        name: 'defender',
+        created_at: new Date(),
+        updated_at: new Date(),
       },{
-        name: 'attacker'
+        name: 'attacker',
+        created_at: new Date(),
+        updated_at: new Date(),
       }]);
     }
   },
 
   down: (queryInterface, Sequelize) => {
-    /*
-      Add reverting commands here.
-      Return a promise to correctly handle asynchronicity.
-
-      Example:
-      return queryInterface.bulkDelete('People', null, {});
-    */
-    return queryInterface.bulkDelete('ships', null, {});
+    return queryInterface.bulkDelete('players', null, {});
   }
 };

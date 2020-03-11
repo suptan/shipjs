@@ -2,32 +2,26 @@
 
 module.exports = {
   up: async (queryInterface) => {
-    /*
-      Add altering commands here.
-      Return a promise to correctly handle asynchronicity.
-
-      Example:
-      return queryInterface.bulkInsert('People', [{
-        name: 'John Doe',
-        isBetaMember: false
-      }], {});
-    */
     await queryInterface.bulkInsert('ships', [{
       name: 'Battleship',
       size: 4,
       status: 1,
+      created_at: new Date(),
     }, {
       name: 'Cruiser',
       size: 3,
       status: 1,
+      created_at: new Date(),
     }, {
       name: 'Destroyer',
       size: 2,
       status: 1,
+      created_at: new Date(),
     }, {
       name: 'Submarine',
       size: 1,
       status: 1,
+      created_at: new Date(),
     }]);
 
     const ships = await queryInterface.sequelize.query(
@@ -36,21 +30,25 @@ module.exports = {
     const shipRow = ships[0];
 
     await queryInterface.bulkInsert('fleets', [{
-      shipId: shipRow[0].id,
+      ship_id: shipRow[0].id,
       amount: 1,
       status: 1,
+      created_at: new Date(),
     }, {
-      shipId: shipRow[1].id,
+      ship_id: shipRow[1].id,
       amount: 2,
       status: 1,
+      created_at: new Date(),
     }, {
-      shipId: shipRow[2].id,
+      ship_id: shipRow[2].id,
       amount: 2,
       status: 1,
+      created_at: new Date(),
     }, {
-      shipId: shipRow[3].id,
+      ship_id: shipRow[3].id,
       amount: 2,
       status: 1,
+      created_at: new Date(),
     }]);
 
     const maps = await queryInterface.sequelize.query(
@@ -59,8 +57,9 @@ module.exports = {
     const mapRow = maps[0];
 
     await queryInterface.bulkInsert('levels', [{
-      mapId: mapRow[0].id,
+      map_id: mapRow[0].id,
       status: 1,
+      created_at: new Date(),
     }]);
 
     const fleets = await queryInterface.sequelize.query(
@@ -73,26 +72,26 @@ module.exports = {
     const levelId = levels[0][0].id;
 
     return await queryInterface.bulkInsert('level_fleets', [{
-      levelId: levelId,
-      fleetId: fleetRow[0].id,
+      level_id: levelId,
+      fleet_id: fleetRow[0].id,
       status: 1,
       created_at: new Date(),
       updated_at: new Date(),
     }, {
-      levelId: levelId,
-      fleetId: fleetRow[1].id,
+      level_id: levelId,
+      fleet_id: fleetRow[1].id,
       status: 1,
       created_at: new Date(),
       updated_at: new Date(),
     }, {
-      levelId: levelId,
-      fleetId: fleetRow[2].id,
+      level_id: levelId,
+      fleet_id: fleetRow[2].id,
       status: 1,
       created_at: new Date(),
       updated_at: new Date(),
     }, {
-      levelId: levelId,
-      fleetId: fleetRow[3].id,
+      level_id: levelId,
+      fleet_id: fleetRow[3].id,
       status: 1,
       created_at: new Date(),
       updated_at: new Date(),
