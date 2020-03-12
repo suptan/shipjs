@@ -23,6 +23,8 @@ const router = express.Router();
  *                $ref: '#definitions/baseShip'
  */
 router.get('/ship', asyncWrapper(async (_, res) => {
+  console.log('foo');
+  
   const result = await models.ship.findAll();
 
   res.status(!result ? 204 : 200).send({

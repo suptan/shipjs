@@ -13,7 +13,8 @@
     "lint:fix": "eslint --fix src",
     "lint": "eslint ./src",
     "unit-test": "NODE_ENV=test jest --silent --coverage --forceExit __tests__/unit",
-    "unit-test:watch": "NODE_ENV=test jest __tests__/unit --watch"
+    "unit-test:watch": "NODE_ENV=test jest __tests__/unit --watch",
+    "e2e-test": "NODE_ENV=test jest __tests__/e2e --testTimeout=10000 --detectOpenHandles --forceExit"
   },
   "dependencies": {
     "@babel/runtime": "~7.8.3",
@@ -45,6 +46,7 @@
     "jest-junit": "~10.0.0",
     "nodemon-webpack-plugin": "~4.2.2",
     "sequelize-cli": "~5.5.1",
+    "supertest": "~4.0.2",
     "webpack": "~4.41.4",
     "webpack-cli": "~3.3.10",
     "webpack-node-externals": "~1.7.2"

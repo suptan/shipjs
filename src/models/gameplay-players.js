@@ -5,7 +5,7 @@ export default (sequelize, DataTypes) => {
     gameplayId: { type: DataTypes.INTEGER },
     playerId: { type: DataTypes.INTEGER },
     status: { type: DataTypes.INTEGER },
-    playerMap: { type: DataTypes.ARRAY(DataTypes.ARRAY(DataTypes.STRING)) }
+    playerMap: { type: DataTypes.ARRAY(DataTypes.ARRAY(DataTypes.INTEGER)) }
   }), { paranoid: true });
 
   gameplayPlayers.associate = function(models) {

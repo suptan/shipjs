@@ -48,17 +48,36 @@ services:
       -  shipjs-node_modules:/usr/src/app/node_modules
     networks:
       - shipjs
-  test-db:
+  test-e2e:
+    build: .
+    image: assign/test-e2e-shipjs
+    command: npm run e2e-test
+    volumes:
+      - '.:/usr/src/app'
+      -  shipjs-node_modules:/usr/src/app/node_modules
+    networks:
+      - shipjs
+    depends_on:
+      - test-shipjs-postgreq
+    environment:
+      NODE_ENV: 'test'
+      POSTGRES_USER: 'api'
+      POSTGRES_PASSWORD: 'api'
+      POSTGRES_DB: 'test-shipjs'
+      POSTGRES_HOST: 'test-shipjs-postgreq'
+      POSTGRES_PORT: '5432'
+      DB_SERVICE: 'test-shipjs-postgreq'
+  test-shipjs-postgreq:
     image: postgres:11
     volumes:
       - 'shipjs-test-db:/var/lib/postgresql/data/pgdata'
     ports:
-      - '5004:5432'
+      - '5014:5432'
     environment:
       PGDATA: '/var/lib/postgresql/data/pgdata'
       POSTGRES_USER: 'api'
       POSTGRES_PASSWORD: 'api'
-      POSTGRES_DB: 'shipjs'
+      POSTGRES_DB: 'test-shipjs'
     networks:
       - shipjs
 volumes:

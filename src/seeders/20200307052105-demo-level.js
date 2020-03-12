@@ -2,16 +2,6 @@
 
 module.exports = {
   up: async (queryInterface) => {
-    /*
-      Add altering commands here.
-      Return a promise to correctly handle asynchronicity.
-
-      Example:
-      return queryInterface.bulkInsert('People', [{
-        name: 'John Doe',
-        isBetaMember: false
-      }], {});
-    */
     await queryInterface.bulkInsert('ships', [{
       name: 'Battleship',
       size: 4,

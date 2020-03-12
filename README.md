@@ -34,9 +34,13 @@ src/
 ````
 
 ## Installation
-1) Ensure that [Docker](https://docs.docker.com/install/) is running on your machine.
+1) Ensure that [Docker](https://docs.docker.com/install/) and [NodeJS](https://nodejs.org/en/download/) are running on your machine.
 
-2) `docker-compose up shipjs` to build the image and start api via http://localhost:9008
+2) Use terminal and in your project path type `npm i` to install modules
+
+3) `docker-compose up shipjs` to build the image and start api via http://localhost:9008
+
+4) Type `npx sequelize-cli db:seed:all` to seed data to database
 
 ## Test
 
