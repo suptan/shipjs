@@ -44,8 +44,14 @@ src/
 
 ## Test
 
+### Unit Test
+
 * Unit testing will watch all your changes in the test files as well as create coverage folder for you.
 `docker-compose up test`
+
+### E2E test
+
+* For simulate a complete game scenario run `docker-compose up test-e2e`
 
 ## Usage
 1) start the API by `docker-compose up shipjs` which run on http://localhost:9008
